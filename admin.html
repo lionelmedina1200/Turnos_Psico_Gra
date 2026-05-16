@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel · Psicóloga</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body class="page-app page-admin">
+
+  <nav class="topnav">
+    <div class="nav-brand">
+      <span class="brand-dot"></span>
+      <span class="brand-name">Panel psicóloga</span>
+    </div>
+    <div class="nav-right">
+      <button class="nav-logout" onclick="doAdminLogout()">Salir</button>
+    </div>
+  </nav>
+
+  <!-- LOGIN ADMIN -->
+  <div id="adminLogin" class="admin-login-wrap">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="logo-circle">P</div>
+        <h2>Acceso psicóloga</h2>
+      </div>
+      <div class="field-group">
+        <label>Email</label>
+        <input type="email" id="adminEmail" placeholder="tu@email.com">
+      </div>
+      <div class="field-group">
+        <label>Contraseña</label>
+        <input type="password" id="adminPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAdminLogin()">
+      </div>
+      <div class="auth-error" id="adminError"></div>
+      <button class="btn-main" onclick="doAdminLogin()">Ingresar</button>
+    </div>
+  </div>
+
+  <!-- PANEL PRINCIPAL -->
+  <div id="adminPanel" style="display:none">
+    <div class="app-layout">
+
+      <aside class="sidebar">
+        <button class="sidebar-btn active" onclick="showAdminSection('calendario')" id="sb-cal">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          Calendario
+        </button>
+        <button class="sidebar-btn" onclick="showAdminSection('solicitudes')" id="sb-sol">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Solicitudes
+          <span class="badge-unread" id="badgePend" style="display:none"></span>
+        </button>
+        <button class="sidebar-btn" onclick="showAdminSection('mensajes')" id="sb-msgs">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Mensajes
+          <span class="badge-unread" id="badgeMsgs" style="display:none"></span>
+        </button>
+        <button class="sidebar-btn" onclick="showAdminSection('config')" id="sb-cfg">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32 1.41-1.41"/></svg>
+          Configuración
+        </button>
+      </aside>
+
+      <main class="main-content">
+
+        <!-- CALENDARIO -->
+        <section id="sec-calendario" class="section active">
+          <div class="section-header">
+            <h2 id="calMesTitle">Junio 2025</h2>
+            <div class="cal-nav">
+              <button class="cal-nav-btn" onclick="cambiarMes(-1)">←</button>
+              <button class="cal-nav-btn" onclick="cambiarMes(1)">→</button>
+            </div>
+          </div>
+          <div class="calendar-grid" id="calendarGrid"></div>
+          <div class="cal-detail" id="calDetail" style="display:none">
+            <h3 id="calDetailTitle"></h3>
+            <div id="calDetailTurnos"></div>
+          </div>
+        </section>
+
+        <!-- SOLICITUDES -->
+        <section id="sec-solicitudes" class="section">
+          <div class="section-header">
+            <h2>Solicitudes de turno</h2>
+          </div>
+          <div class="filter-pills">
+            <button class="pill active" onclick="filterSolicitudes('pendiente_pago',this)">Esperando pago</button>
+            <button class="pill" onclick="filterSolicitudes('pago_enviado',this)">Comprobante enviado</button>
+            <button class="pill" onclick="filterSolicitudes('confirmado',this)">Confirmados</button>
+            <button class="pill" onclick="filterSolicitudes('cancelado',this)">Cancelados</button>
+            <button class="pill" onclick="filterSolicitudes('todos',this)">Todos</button>
+          </div>
+          <div id="solicitudesList" class="turnos-grid"></div>
+        </section>
+
+        <!-- MENSAJES -->
+        <section id="sec-mensajes" class="section">
+          <div class="section-header">
+            <h2>Mensajes de pacientes</h2>
+          </div>
+          <div class="msgs-layout">
+            <div class="msgs-sidebar" id="msgsSidebar"></div>
+            <div class="msgs-chat" id="msgsChat">
+              <div class="msgs-empty">
+                <p>Seleccioná un paciente para ver la conversación</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CONFIG -->
+        <section id="sec-config" class="section">
+          <div class="section-header">
+            <h2>Configuración</h2>
+          </div>
+          <div class="config-grid">
+            <div class="config-card">
+              <h3>Datos de pago</h3>
+              <div class="field-group">
+                <label>CBU</label>
+                <input type="text" id="cfgCBU" placeholder="0000000000000000000000">
+              </div>
+              <div class="field-group">
+                <label>Alias</label>
+                <input type="text" id="cfgAlias" placeholder="NOMBRE.APELLIDO.MP">
+              </div>
+              <div class="field-group">
+                <label>Titular</label>
+                <input type="text" id="cfgTitular" placeholder="Nombre Apellido">
+              </div>
+            </div>
+            <div class="config-card">
+              <h3>Horarios disponibles</h3>
+              <p class="config-hint">Marcá los horarios que ofrecés</p>
+              <div class="horarios-config" id="horariosConfig"></div>
+            </div>
+            <div class="config-card">
+              <h3>WhatsApp</h3>
+              <div class="field-group">
+                <label>Tu número (con código país, sin +)</label>
+                <input type="tel" id="cfgWspPsi" placeholder="5491165432100">
+              </div>
+            </div>
+          </div>
+          <button class="btn-main" style="max-width:200px;margin-top:1rem" onclick="saveConfig()">Guardar cambios</button>
+          <div id="cfgOk" class="cfg-success" style="display:none">✓ Guardado</div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- MODAL TURNO DETALLE -->
+  <div class="modal-overlay" id="modalTurno">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi cuenta · Consultorio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body class="page-app">
+
+  <nav class="topnav">
+    <div class="nav-brand">
+      <span class="brand-dot"></span>
+      <span class="brand-name">Consultorio</span>
+    </div>
+    <div class="nav-right">
+      <span class="nav-user" id="navUser"></span>
+      <button class="nav-logout" onclick="doLogout()">Salir</button>
+    </div>
+  </nav>
+
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <button class="sidebar-btn active" onclick="showSection('turnos')" id="sb-turnos">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Mis turnos
+      </button>
+      <button class="sidebar-btn" onclick="showSection('nuevo')" id="sb-nuevo">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+        Nuevo turno
+      </button>
+      <button class="sidebar-btn" onclick="showSection('mensajes')" id="sb-mensajes">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Mensajes
+        <span class="badge-unread" id="badgeUnread" style="display:none"></span>
+      </button>
+    </aside>
+
+    <main class="main-content">
+
+      <!-- MIS TURNOS -->
+      <section id="sec-turnos" class="section active">
+        <div class="section-header">
+          <h2>Mis turnos</h2>
+        </div>
+        <div id="turnosList" class="turnos-grid"></div>
+      </section>
+
+      <!-- NUEVO TURNO -->
+      <section id="sec-nuevo" class="section">
+        <div class="section-header">
+          <h2>Reservar turno</h2>
+          <p class="section-sub">Valor de la sesión: <strong>$40.000</strong></p>
+        </div>
+
+        <div class="booking-flow">
+          <!-- PASO 1: Elegir fecha -->
+          <div class="step-card" id="step1">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <h3>Elegí una fecha</h3>
+              <input type="date" id="bookFecha" class="date-input" min="">
+              <div class="horarios-grid" id="horariosGrid" style="display:none"></div>
+            </div>
+          </div>
+
+          <!-- PASO 2: Comprobante -->
+          <div class="step-card locked" id="step2">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <h3>Subí el comprobante de pago</h3>
+              <p class="step-hint">Transferí <strong>$40.000</strong> al siguiente CBU/Alias y adjuntá el comprobante.</p>
+              <div class="payment-info">
+                <div class="payment-row"><span>CBU</span><strong id="configCBU">—</strong></div>
+                <div class="payment-row"><span>Alias</span><strong id="configAlias">—</strong></div>
+                <div class="payment-row"><span>Titular</span><strong id="configTitular">—</strong></div>
+              </div>
+              <label class="upload-area" id="uploadArea">
+                <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span id="uploadText">Tocá para subir imagen</span>
+                <input type="file" id="comprobanteFile" accept="image/*" style="display:none" onchange="previewFile(this)">
+              </label>
+              <img id="previewImg" style="display:none;max-width:100%;border-radius:10px;margin-top:12px;max-height:200px;object-fit:cover">
+            </div>
+          </div>
+
+          <!-- PASO 3: Confirmar -->
+          <div class="step-card locked" id="step3">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <h3>Confirmar solicitud</h3>
+              <div class="summary-box" id="summaryBox"></div>
+              <button class="btn-main" onclick="enviarSolicitud()" id="btnEnviar">Enviar solicitud</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MENSAJES -->
+      <section id="sec-mensajes" class="section">
+        <div class="section-header">
+          <h2>Mensajes</h2>
+          <p class="section-sub">Comunicación directa con la psicóloga</p>
+        </div>
+        <div class="chat-wrap">
+          <div class="chat-messages" id="chatMessages"></div>
+          <div class="chat-input-wrap">
+            <textarea class="chat-input" id="msgInput" placeholder="Escribí tu mensaje..." rows="1" onkeydown="handleMsgKey(event)"></textarea>
+            <button class="chat-send" onclick="sendMessage()">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/paciente.js"></script>
+</body>
+</html>
