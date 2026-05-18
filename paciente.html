@@ -25,6 +25,8 @@
     .brand-name { font-weight: 500; font-size: 0.875rem; }
     .nav-r { display: flex; align-items: center; gap: 10px; }
     .nav-user { font-size: 0.775rem; color: var(--text2); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .nav-avatar { display: none; width: 28px; height: 28px; border-radius: 50%; background: var(--sage-light); color: var(--sage-deep); font-size: 0.7rem; font-weight: 500; align-items: center; justify-content: center; flex-shrink: 0; }
+    @media (max-width: 680px) { .nav-user { display: none; } .nav-avatar { display: flex; } }
     .nav-out { padding: 6px 14px; border: 1px solid var(--border2); border-radius: 20px; background: none; font-size: 0.775rem; cursor: pointer; color: var(--text2); font-family: 'DM Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
 
     /* ── LAYOUT ── */
@@ -172,6 +174,7 @@
   <div class="brand"><span class="brand-dot"></span><span class="brand-name">Consultorio</span></div>
   <div class="nav-r">
     <span class="nav-user" id="navUser"></span>
+    <div class="nav-avatar" id="navAvatar"></div>
     <button class="nav-out" onclick="doLogout()">Salir</button>
   </div>
 </nav>
@@ -299,7 +302,10 @@ sb.auth.getSession().then(async ({ data }) => {
   if (!data.session) { window.location.replace('index.html'); return; }
   if (data.session.user.email === ADMIN) { window.location.replace('admin.html'); return; }
   user = data.session.user;
-  $('navUser').textContent = user.user_metadata?.nombre || user.user_metadata?.full_name || user.email;
+  const displayName = user.user_metadata?.nombre || user.user_metadata?.full_name || user.email;
+  $('navUser').textContent = displayName;
+  const initials = displayName.split(' ').slice(0,2).map(x=>x[0]||'').join('').toUpperCase() || '?';
+  $('navAvatar').textContent = initials;
   const { data: p } = await sb.from('pacientes').select('*').eq('user_id', user.id).single();
   paciente = p;
   if (!p) {
