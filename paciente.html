@@ -303,8 +303,16 @@ sb.auth.getSession().then(async ({ data }) => {
   const { data: p } = await sb.from('pacientes').select('*').eq('user_id', user.id).single();
   paciente = p;
   if (!p) {
-    const nombre = user.user_metadata?.full_name || user.user_metadata?.nombre || '';
-    if (nombre) { await sb.from('pacientes').insert({ user_id: user.id, nombre, email: user.email }); paciente = { nombre, email: user.email }; }
+    // Usuario nuevo (Google o email sin perfil) — crear perfil siempre
+    const nombre = user.user_metadata?.full_name || user.user_metadata?.name || user.user_metadata?.nombre || '';
+    const tel    = user.user_metadata?.tel || '';
+    await sb.from('pacientes').upsert({ user_id: user.id, nombre, tel, email: user.email }, { onConflict: 'user_id' });
+    paciente = { nombre, tel, email: user.email };
+  } else if (!p.nombre && (user.user_metadata?.full_name || user.user_metadata?.name)) {
+    // Perfil existente sin nombre (entró con Google antes del fix) — actualizar
+    const nombre = user.user_metadata?.full_name || user.user_metadata?.name || '';
+    await sb.from('pacientes').update({ nombre }).eq('user_id', user.id);
+    paciente = { ...p, nombre };
   }
   const man = new Date(); man.setDate(man.getDate()+1); $('bFecha').min = man.toISOString().split('T')[0];
   offOv();
