@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Turnos · Consultorio</title>
+  <title>Turnos · Consultorio Graciela</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { font-size: 15px; }
@@ -13,290 +13,209 @@
     :root {
       --sage: #7a9e8e; --sage-deep: #4d7a68; --sage-light: #eaf2ee; --sage-mid: #c2d9cf;
       --warm: #f7f5f0; --rose: #c47b7b; --rose-light: #f7eded;
-      --surface: #ffffff; --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.13);
+      --surface: #fff; --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.14);
       --text: #2c2c2c; --text2: #6b6b6b; --text3: #a0a0a0;
-      --radius: 12px; --radius-sm: 8px;
+      --r: 14px; --rs: 9px;
     }
-    h1 { font-family: 'DM Serif Display', serif; font-size: 2.8rem; line-height: 1.15; font-weight: 400; }
-    em { font-style: italic; color: var(--sage-deep); }
 
-    .landing-wrap { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
-    .landing-left {
+    /* LAYOUT */
+    .wrap { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
+
+    /* LEFT PANEL */
+    .left {
       background: var(--sage-light); padding: 3rem;
       display: flex; flex-direction: column; justify-content: space-between;
       position: relative; overflow: hidden;
     }
-    .landing-left::before {
-      content: ''; position: absolute; width: 380px; height: 380px;
+    .left::before {
+      content: ''; position: absolute;
+      width: 360px; height: 360px;
       background: radial-gradient(circle, var(--sage-mid) 0%, transparent 70%);
-      bottom: -100px; right: -80px; pointer-events: none;
+      bottom: -90px; right: -70px; pointer-events: none;
     }
-    .brand { display: flex; align-items: center; gap: 8px; }
+    .brand { display: flex; align-items: center; gap: 9px; z-index: 1; }
     .brand-dot { width: 10px; height: 10px; background: var(--sage); border-radius: 50%; }
-    .brand-name { font-weight: 500; font-size: 0.95rem; }
-    .landing-copy p { color: var(--text2); font-size: 1rem; margin-top: 1rem; max-width: 320px; }
-    .deco { width: 100px; height: 100px; border: 2px solid var(--sage-mid); border-radius: 50%; align-self: flex-end; opacity: 0.4; }
+    .brand-name { font-weight: 500; font-size: 0.9rem; }
+    .copy { z-index: 1; }
+    .copy h1 { font-family: 'DM Serif Display', serif; font-size: 2.8rem; line-height: 1.15; font-weight: 400; margin-bottom: 1rem; }
+    .copy h1 em { font-style: italic; color: var(--sage-deep); }
+    .copy p { color: var(--text2); line-height: 1.65; max-width: 300px; }
+    .deco { width: 90px; height: 90px; border: 2px solid var(--sage-mid); border-radius: 50%; align-self: flex-end; opacity: 0.45; }
 
-    .landing-right { display: flex; align-items: center; justify-content: center; padding: 2rem; }
-    .auth-card {
-      background: var(--surface); border-radius: 20px; padding: 2.25rem;
-      width: 100%; max-width: 400px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.09); border: 1px solid var(--border);
-    }
-    .auth-tabs { display: flex; background: var(--warm); border-radius: var(--radius-sm); padding: 4px; gap: 4px; margin-bottom: 1.5rem; }
-    .auth-tab {
-      flex: 1; padding: 8px; border: none; background: none; border-radius: 6px;
-      font-size: 0.875rem; font-family: 'DM Sans', sans-serif; cursor: pointer;
-      color: var(--text2); transition: all 0.15s;
-    }
-    .auth-tab.active { background: var(--surface); color: var(--text); font-weight: 500; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    /* RIGHT / AUTH */
+    .right { display: flex; align-items: center; justify-content: center; padding: 2rem; background: var(--warm); }
+    .card { background: var(--surface); border-radius: 20px; padding: 2.25rem; width: 100%; max-width: 400px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); border: 1px solid var(--border); }
 
-    .field-group { margin-bottom: 1rem; }
-    .field-group label { display: block; font-size: 0.75rem; color: var(--text2); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; }
-    .field-group input {
-      width: 100%; padding: 10px 13px; border: 1px solid var(--border2);
-      border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif;
-      font-size: 0.925rem; color: var(--text); background: var(--surface); outline: none; transition: border-color 0.15s;
-    }
-    .field-group input:focus { border-color: var(--sage); box-shadow: 0 0 0 3px rgba(122,158,142,0.12); }
+    /* TABS */
+    .tabs { display: flex; background: var(--warm); border-radius: var(--rs); padding: 4px; gap: 4px; margin-bottom: 1.5rem; }
+    .tab { flex: 1; padding: 8px; border: none; background: none; border-radius: 6px; font-size: 0.875rem; font-family: 'DM Sans', sans-serif; cursor: pointer; color: var(--text2); transition: all 0.15s; }
+    .tab.active { background: var(--surface); color: var(--text); font-weight: 500; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
 
-    .btn-main {
-      width: 100%; padding: 12px; background: var(--sage-deep); color: white;
-      border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif;
-      font-size: 0.925rem; font-weight: 500; cursor: pointer; transition: background 0.15s;
+    /* FORM */
+    .fg { margin-bottom: 1rem; }
+    .fg label { display: block; font-size: 0.72rem; color: var(--text2); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; }
+    .fg input {
+      width: 100%; padding: 11px 13px; border: 1px solid var(--border2);
+      border-radius: var(--rs); font-family: 'DM Sans', sans-serif;
+      font-size: 1rem; color: var(--text); background: var(--surface); outline: none;
+      transition: border-color 0.15s; -webkit-appearance: none; appearance: none;
     }
-    .btn-main:hover { background: #3d6655; }
-    .btn-main:disabled { opacity: 0.6; cursor: default; }
-    .btn-google {
-      width: 100%; padding: 11px; background: var(--surface); color: var(--text);
-      border: 1px solid var(--border2); border-radius: var(--radius-sm);
-      font-family: 'DM Sans', sans-serif; font-size: 0.875rem; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 10px; transition: background 0.15s;
-    }
+    .fg input:focus { border-color: var(--sage); box-shadow: 0 0 0 3px rgba(122,158,142,0.12); }
+
+    .btn { width: 100%; padding: 13px; background: var(--sage-deep); color: white; border: none; border-radius: var(--rs); font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 500; cursor: pointer; transition: background 0.15s; -webkit-tap-highlight-color: transparent; }
+    .btn:hover { background: #3d6655; }
+    .btn:disabled { opacity: 0.6; cursor: default; }
+    .btn-google { width: 100%; padding: 12px; background: var(--surface); color: var(--text); border: 1px solid var(--border2); border-radius: var(--rs); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: background 0.12s; -webkit-tap-highlight-color: transparent; }
     .btn-google:hover { background: var(--warm); }
+
     .divider { text-align: center; margin: 1rem 0; position: relative; }
     .divider::before { content: ''; position: absolute; left: 0; top: 50%; width: 100%; height: 1px; background: var(--border); }
     .divider span { background: var(--surface); padding: 0 12px; position: relative; font-size: 0.8rem; color: var(--text3); }
-    .auth-error { font-size: 0.8rem; color: var(--rose); background: var(--rose-light); padding: 9px 12px; border-radius: var(--radius-sm); margin-bottom: 10px; display: none; }
-    .auth-footer { text-align: center; font-size: 0.8rem; color: var(--text3); margin-top: 1.25rem; }
-    .auth-footer a { color: var(--sage-deep); text-decoration: none; font-weight: 500; }
-    .auth-success { background: var(--sage-light); border: 1px solid var(--sage-mid); border-radius: var(--radius-sm); padding: 12px; font-size: 0.875rem; color: var(--sage-deep); margin-bottom: 10px; display: none; }
 
-    .loading-overlay {
-      display: none; position: fixed; inset: 0; background: rgba(247,245,240,0.85);
-      align-items: center; justify-content: center; z-index: 999; font-size: 0.9rem; color: var(--text2);
-      flex-direction: column; gap: 12px;
-    }
-    .loading-overlay.show { display: flex; }
-    .spinner { width: 28px; height: 28px; border: 2px solid var(--sage-mid); border-top-color: var(--sage-deep); border-radius: 50%; animation: spin 0.7s linear infinite; }
+    .err { font-size: 0.82rem; color: var(--rose); background: var(--rose-light); padding: 9px 12px; border-radius: var(--rs); margin-bottom: 10px; display: none; }
+    .ok  { font-size: 0.82rem; color: var(--sage-deep); background: var(--sage-light); padding: 9px 12px; border-radius: var(--rs); margin-bottom: 10px; display: none; }
+
+    .footer-link { text-align: center; font-size: 0.8rem; color: var(--text3); margin-top: 1.25rem; }
+    .footer-link a { color: var(--sage-deep); text-decoration: none; font-weight: 500; }
+
+    /* LOADING */
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(247,245,240,0.9); align-items: center; justify-content: center; z-index: 999; flex-direction: column; gap: 12px; }
+    .overlay.on { display: flex; }
+    .spin { width: 28px; height: 28px; border: 2px solid var(--sage-mid); border-top-color: var(--sage-deep); border-radius: 50%; animation: spin 0.7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
+    .overlay p { font-size: 0.875rem; color: var(--text2); }
 
-    @media (max-width: 700px) {
-      .landing-wrap { grid-template-columns: 1fr; }
-      .landing-left { display: none; }
+    /* RESPONSIVE */
+    @media (max-width: 680px) {
+      .wrap { grid-template-columns: 1fr; }
+      .left { display: none; }
+      .right { min-height: 100vh; align-items: flex-start; padding: 1.5rem 1rem; background: var(--warm); }
+      .card { border-radius: 16px; padding: 1.75rem 1.25rem; box-shadow: none; border: none; background: var(--surface); max-width: 100%; }
+      /* Show mini brand on mobile */
+      .mobile-brand { display: flex; align-items: center; gap: 8px; margin-bottom: 1.5rem; }
+      .mobile-brand .brand-dot { width: 9px; height: 9px; background: var(--sage); border-radius: 50%; }
+      .mobile-brand span { font-weight: 500; font-size: 0.9rem; }
     }
+    @media (min-width: 681px) { .mobile-brand { display: none; } }
   </style>
 </head>
 <body>
 
-<div class="loading-overlay" id="loadingOverlay">
-  <div class="spinner"></div>
-  <span id="loadingText">Cargando...</span>
-</div>
+<div class="overlay" id="ov"><div class="spin"></div><p id="ovTxt">Cargando...</p></div>
 
-<div class="landing-wrap">
-  <div class="landing-left">
+<div class="wrap">
+  <div class="left">
     <div class="brand"><span class="brand-dot"></span><span class="brand-name">Consultorio</span></div>
-    <div class="landing-copy">
+    <div class="copy">
       <h1>Un espacio<br><em>para vos.</em></h1>
-      <p>Reservá tu turno de forma simple y segura. Te acompañamos en cada paso.</p>
+      <p>Reservá tu turno de forma simple y segura. Te acompañamos en cada paso del proceso.</p>
     </div>
     <div class="deco"></div>
   </div>
 
-  <div class="landing-right">
-    <div class="auth-card">
-      <div class="auth-tabs">
-        <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Ingresar</button>
-        <button class="auth-tab" id="tabRegister" onclick="switchTab('register')">Crear cuenta</button>
+  <div class="right">
+    <div class="card">
+      <div class="mobile-brand"><span class="brand-dot"></span><span>Consultorio</span></div>
+
+      <div class="tabs">
+        <button class="tab active" id="tLogin"    onclick="switchTab('login')">Ingresar</button>
+        <button class="tab"        id="tRegister" onclick="switchTab('register')">Crear cuenta</button>
       </div>
 
       <!-- LOGIN -->
-      <div id="formLogin">
-        <div class="auth-error" id="loginError"></div>
-        <div class="field-group">
-          <label>Email</label>
-          <input type="email" id="loginEmail" placeholder="tu@email.com" autocomplete="email">
-        </div>
-        <div class="field-group">
-          <label>Contraseña</label>
-          <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password"
-            onkeydown="if(event.key==='Enter') doLogin()">
-        </div>
-        <button class="btn-main" id="btnLogin" onclick="doLogin()">Ingresar</button>
+      <div id="fLogin">
+        <div class="err" id="eLogin"></div>
+        <div class="fg"><label>Email</label><input type="email" id="lEmail" placeholder="tu@email.com" autocomplete="email" inputmode="email"></div>
+        <div class="fg"><label>Contraseña</label><input type="password" id="lPass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <button class="btn" id="btnLogin" onclick="doLogin()">Ingresar</button>
         <div class="divider"><span>o</span></div>
-        <button class="btn-google" onclick="doGoogleLogin()">
+        <button class="btn-google" onclick="doGoogle()">
           <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
           Continuar con Google
         </button>
       </div>
 
       <!-- REGISTER -->
-      <div id="formRegister" style="display:none">
-        <div class="auth-error" id="regError"></div>
-        <div class="auth-success" id="regSuccess"></div>
-        <div class="field-group">
-          <label>Nombre completo</label>
-          <input type="text" id="regNombre" placeholder="María González">
-        </div>
-        <div class="field-group">
-          <label>Teléfono (WhatsApp)</label>
-          <input type="tel" id="regTel" placeholder="1165432100">
-        </div>
-        <div class="field-group">
-          <label>Email</label>
-          <input type="email" id="regEmail" placeholder="tu@email.com">
-        </div>
-        <div class="field-group">
-          <label>Contraseña</label>
-          <input type="password" id="regPassword" placeholder="Mínimo 6 caracteres">
-        </div>
-        <button class="btn-main" id="btnRegister" onclick="doRegister()">Crear cuenta</button>
+      <div id="fReg" style="display:none">
+        <div class="err" id="eReg"></div>
+        <div class="ok"  id="okReg"></div>
+        <div class="fg"><label>Nombre completo</label><input type="text" id="rNombre" placeholder="María González" autocomplete="name"></div>
+        <div class="fg"><label>WhatsApp</label><input type="tel" id="rTel" placeholder="1165432100" inputmode="tel" autocomplete="tel"></div>
+        <div class="fg"><label>Email</label><input type="email" id="rEmail" placeholder="tu@email.com" autocomplete="email" inputmode="email"></div>
+        <div class="fg"><label>Contraseña</label><input type="password" id="rPass" placeholder="Mínimo 6 caracteres" autocomplete="new-password"></div>
+        <button class="btn" id="btnReg" onclick="doRegister()">Crear cuenta</button>
         <div class="divider"><span>o</span></div>
-        <button class="btn-google" onclick="doGoogleLogin()">
+        <button class="btn-google" onclick="doGoogle()">
           <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
           Registrarse con Google
         </button>
       </div>
 
-      <p class="auth-footer">¿Sos la psicóloga? <a href="admin.html">Ingresá acá →</a></p>
+      <p class="footer-link">¿Sos la psicóloga? <a href="admin.html">Ingresá acá →</a></p>
     </div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
-  // ── CONFIG ──────────────────────────────────────────
-  const SUPABASE_URL     = 'https://dzvfjedtjhlvwipnxzmi.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6dmZqZWR0amhsdndpcG54em1pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5NDc2NTMsImV4cCI6MjA5NDUyMzY1M30.5JcK7Ll67WIFoTY6Z00qiOEEbzh8nC3y1lmiBkuo8zU';
-  const ADMIN_EMAIL      = 'gracielacolli@gmail.com';
-  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const SURL = 'https://dzvfjedtjhlvwipnxzmi.supabase.co';
+const SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6dmZqZWR0amhsdndpcG54em1pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5NDc2NTMsImV4cCI6MjA5NDUyMzY1M30.5JcK7Ll67WIFoTY6Z00qiOEEbzh8nC3y1lmiBkuo8zU';
+const ADMIN = 'gracielacolli@gmail.com';
+const sb = supabase.createClient(SURL, SKEY);
+const $ = id => document.getElementById(id);
 
-  // ── HELPERS ─────────────────────────────────────────
-  function showLoading(msg) {
-    document.getElementById('loadingText').textContent = msg || 'Cargando...';
-    document.getElementById('loadingOverlay').classList.add('show');
-  }
-  function hideLoading() { document.getElementById('loadingOverlay').classList.remove('show'); }
+function ov(t) { $('ovTxt').textContent = t; $('ov').classList.add('on'); }
+function offOv() { $('ov').classList.remove('on'); }
+function goAfter(u) { window.location.replace(u.email === ADMIN ? 'admin.html' : 'paciente.html'); }
 
-  function showErr(id, msg) {
-    const el = document.getElementById(id);
-    el.textContent = msg; el.style.display = msg ? 'block' : 'none';
-  }
-  function showOk(id, msg) {
-    const el = document.getElementById(id);
-    el.textContent = msg; el.style.display = msg ? 'block' : 'none';
-  }
+ov('Verificando sesión...');
+sb.auth.getSession().then(({ data }) => {
+  if (data.session) goAfter(data.session.user); else offOv();
+}).catch(offOv);
 
-  function redirectAfterLogin(user) {
-    if (user.email === ADMIN_EMAIL) {
-      window.location.replace('admin.html');
-    } else {
-      window.location.replace('paciente.html');
-    }
-  }
+function switchTab(t) {
+  $('fLogin').style.display  = t === 'login' ? 'block' : 'none';
+  $('fReg').style.display    = t === 'register' ? 'block' : 'none';
+  $('tLogin').classList.toggle('active', t === 'login');
+  $('tRegister').classList.toggle('active', t === 'register');
+  $('eLogin').style.display = $('eReg').style.display = $('okReg').style.display = 'none';
+}
 
-  function switchTab(tab) {
-    document.getElementById('formLogin').style.display    = tab === 'login'    ? 'block' : 'none';
-    document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 'none';
-    document.getElementById('tabLogin').classList.toggle('active',    tab === 'login');
-    document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
-    showErr('loginError',''); showErr('regError','');
-  }
+async function doLogin() {
+  const email = $('lEmail').value.trim(), pass = $('lPass').value;
+  $('eLogin').style.display = 'none';
+  if (!email || !pass) { showE('eLogin','Completá email y contraseña.'); return; }
+  const btn = $('btnLogin'); btn.disabled = true; btn.textContent = 'Ingresando...';
+  ov('Ingresando...');
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error) { offOv(); btn.disabled = false; btn.textContent = 'Ingresar'; showE('eLogin', 'Email o contraseña incorrectos.'); return; }
+  goAfter(data.user);
+}
 
-  // ── CHEQUEAR SESIÓN AL CARGAR ────────────────────────
-  showLoading('Verificando sesión...');
-  sb.auth.getSession().then(({ data }) => {
-    if (data.session) {
-      redirectAfterLogin(data.session.user);
-    } else {
-      hideLoading();
-    }
-  }).catch(() => hideLoading());
+async function doRegister() {
+  const nombre = $('rNombre').value.trim(), tel = $('rTel').value.trim(),
+        email  = $('rEmail').value.trim(),  pass = $('rPass').value;
+  $('eReg').style.display = $('okReg').style.display = 'none';
+  if (!nombre || !email || !pass) { showE('eReg','Completá nombre, email y contraseña.'); return; }
+  if (pass.length < 6) { showE('eReg','La contraseña necesita al menos 6 caracteres.'); return; }
+  const btn = $('btnReg'); btn.disabled = true; btn.textContent = 'Creando cuenta...';
+  ov('Creando cuenta...');
+  const { data, error } = await sb.auth.signUp({ email, password: pass, options: { data: { nombre, tel } } });
+  if (error) { offOv(); btn.disabled = false; btn.textContent = 'Crear cuenta'; showE('eReg', error.message); return; }
+  if (data.user) await sb.from('pacientes').upsert({ user_id: data.user.id, nombre, tel, email });
+  offOv(); btn.disabled = false; btn.textContent = 'Crear cuenta';
+  if (data.session) { goAfter(data.user); return; }
+  showOk('okReg', '✓ Cuenta creada. Revisá tu email para confirmarla y luego ingresá.');
+}
 
-  // ── LOGIN ────────────────────────────────────────────
-  async function doLogin() {
-    const email    = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
-    showErr('loginError', '');
-    if (!email || !password) return showErr('loginError', 'Completá email y contraseña.');
+async function doGoogle() {
+  ov('Conectando con Google...');
+  const { error } = await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + '/paciente.html' } });
+  if (error) { offOv(); alert('Error con Google: ' + error.message); }
+}
 
-    const btn = document.getElementById('btnLogin');
-    btn.disabled = true; btn.textContent = 'Ingresando...';
-    showLoading('Ingresando...');
-
-    const { data, error } = await sb.auth.signInWithPassword({ email, password });
-
-    if (error) {
-      hideLoading();
-      btn.disabled = false; btn.textContent = 'Ingresar';
-      const msg = error.message.includes('Invalid') ? 'Email o contraseña incorrectos.' : error.message;
-      return showErr('loginError', msg);
-    }
-    redirectAfterLogin(data.user);
-  }
-
-  // ── REGISTER ─────────────────────────────────────────
-  async function doRegister() {
-    const nombre   = document.getElementById('regNombre').value.trim();
-    const tel      = document.getElementById('regTel').value.trim();
-    const email    = document.getElementById('regEmail').value.trim();
-    const password = document.getElementById('regPassword').value;
-    showErr('regError', ''); showOk('regSuccess', '');
-
-    if (!nombre || !email || !password) return showErr('regError', 'Completá nombre, email y contraseña.');
-    if (password.length < 6) return showErr('regError', 'La contraseña debe tener al menos 6 caracteres.');
-
-    const btn = document.getElementById('btnRegister');
-    btn.disabled = true; btn.textContent = 'Creando cuenta...';
-    showLoading('Creando cuenta...');
-
-    const { data, error } = await sb.auth.signUp({
-      email, password,
-      options: { data: { nombre, tel } }
-    });
-
-    if (error) {
-      hideLoading();
-      btn.disabled = false; btn.textContent = 'Crear cuenta';
-      return showErr('regError', error.message);
-    }
-
-    // Guardar perfil
-    if (data.user) {
-      await sb.from('pacientes').upsert({ user_id: data.user.id, nombre, tel, email });
-    }
-
-    hideLoading();
-    btn.disabled = false; btn.textContent = 'Crear cuenta';
-
-    // Si Supabase requiere confirmación de email
-    if (data.session) {
-      redirectAfterLogin(data.user);
-    } else {
-      showOk('regSuccess', '✓ Cuenta creada. Revisá tu email para confirmarla y luego ingresá.');
-    }
-  }
-
-  // ── GOOGLE ───────────────────────────────────────────
-  async function doGoogleLogin() {
-    showLoading('Conectando con Google...');
-    const { error } = await sb.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: window.location.origin + '/paciente.html' }
-    });
-    if (error) { hideLoading(); alert('Error al conectar con Google: ' + error.message); }
-  }
+function showE(id, msg) { const el=$(id); el.textContent=msg; el.style.display='block'; }
+function showOk(id, msg) { const el=$(id); el.textContent=msg; el.style.display='block'; }
 </script>
 </body>
 </html>
