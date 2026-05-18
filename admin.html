@@ -458,7 +458,8 @@ sb.auth.getSession().then(({ data }) => {
 function showPanel() {
   $('loginSec').style.display = 'none';
   $('panelSec').style.display = 'block';
-  $('botnavEl').style.display = 'block';
+  // Solo mostrar bottom nav en mobile (el CSS lo oculta en desktop, pero el inline style lo pisaba)
+  $('botnavEl').style.display = '';
   $('navR').innerHTML = `<button class="nav-out" onclick="doLogout()">Salir</button>`;
   const n = new Date(); calY=n.getFullYear(); calM=n.getMonth();
   document.body.classList.add('ready');
@@ -622,8 +623,8 @@ async function loadMsgs() {
   const ids=visibleIds;
   if (!ids.length) { $('msgsSB').innerHTML='<div class="msgs-empty">Sin conversaciones</div>'; return; }
 
-  const { data:pacs } = await sb.from('pacientes').select('user_id,nombre').in('user_id',ids);
-  const nm={}; (pacs||[]).forEach(p=>nm[p.user_id]=p.nombre);
+  const { data:pacs } = await sb.from('pacientes').select('user_id,nombre,email').in('user_id',ids);
+  const nm={}; (pacs||[]).forEach(p=>nm[p.user_id]=p.nombre||p.email||null);
 
   $('msgsSB').innerHTML=ids.map(pid=>{
     const info=byP[pid];
@@ -631,7 +632,7 @@ async function loadMsgs() {
     const hiddenTs=hiddenMap[pid];
     const visibleMsgs=hiddenTs?info.msgs.filter(m=>m.created_at>hiddenTs):info.msgs;
     const lastMsg=visibleMsgs[0]; // más reciente
-    const nom=nm[pid]||'Paciente';
+    const nom=nm[pid]||'Paciente sin nombre';
     const unread=hiddenTs?visibleMsgs.filter(m=>!m.leido&&m.remitente==='paciente').length:info.unread;
     return `<div class="pat ${selPat===pid?'on':''}" onclick="selPat2('${pid}','${nom.replace(/'/g,"\\'")}')">
       <div class="av" style="width:30px;height:30px;font-size:.72rem;flex-shrink:0">${ini(nom)}</div>
