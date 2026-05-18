@@ -141,11 +141,22 @@
     @media (max-width: 680px) {
       .sidebar { display: none; }
       .botnav { display: block; }
-      .main { padding: 1rem 0.875rem; padding-bottom: 72px; } /* space for bottom nav */
+      .main { padding: 1rem 0.875rem; padding-bottom: 72px; }
       .hgrid { grid-template-columns: repeat(3, 1fr); }
       .chat-wrap { height: calc(100vh - 54px - 60px - 2rem); min-height: 300px; }
       .chat-msgs { flex: 1; }
       .nav-user { display: none; }
+      /* Booking flow en mobile */
+      .flow { gap: 10px; }
+      .step { padding: 1rem; gap: 10px; }
+      .payrow { font-size: 0.78rem; }
+      .payrow strong { font-size: 0.78rem; }
+      /* Turnos en mobile */
+      .tc { padding: 0.875rem; }
+      /* Botones mas grandes en mobile */
+      .btn-main { padding: 14px; font-size: 1rem; }
+      input[type=date], .inp { padding: 13px; font-size: 1rem; }
+      .hbtn { padding: 11px 4px; font-size: 0.85rem; }
     }
     @media (min-width: 681px) {
       .chat-wrap { height: calc(100vh - 54px - 3rem - 60px); min-height: 360px; max-width: 640px; }
@@ -399,16 +410,36 @@ function resetBook() {
 }
 
 // ── MENSAJES ──────────────────────────────────────────────────
+let msgPolling = null;
+
 async function loadMsgs() {
-  const { data } = await sb.from('mensajes').select('*').eq('paciente_id', user.id).order('created_at',{ascending:true});
+  const { data, error } = await sb.from('mensajes')
+    .select('*')
+    .eq('paciente_id', user.id)
+    .order('created_at', { ascending: true });
+
+  if (error) { console.error('Error mensajes:', error); return; }
+
   const el = $('chatMsgs');
-  if (!data?.length) { el.innerHTML='<div class="empty">Todavía no hay mensajes.<br>¡Escribile a la psicóloga!</div>'; return; }
+  const wasAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+
+  if (!data?.length) {
+    el.innerHTML = '<div class="empty">Todavía no hay mensajes.<br>¡Escribile a la psicóloga!</div>';
+    return;
+  }
+
   el.innerHTML = data.map(m => {
-    const isMe = m.remitente==='paciente';
-    return `<div><div class="msg ${isMe?'msg-me':'msg-oth'}">${esc(m.contenido)}</div><div class="msg-t" style="text-align:${isMe?'right':'left'}">${fmtT(m.created_at)}</div></div>`;
+    const isMe = m.remitente === 'paciente';
+    return `<div>
+      <div class="msg ${isMe ? 'msg-me' : 'msg-oth'}">${esc(m.contenido)}</div>
+      <div class="msg-t" style="text-align:${isMe?'right':'left'}">${fmtT(m.created_at)}</div>
+    </div>`;
   }).join('');
-  el.scrollTop = el.scrollHeight;
-  const unread = data.filter(m=>m.remitente==='psicologa'&&!m.leido).length;
+
+  if (wasAtBottom || el.scrollTop === 0) el.scrollTop = el.scrollHeight;
+
+  // Badge mensajes no leídos
+  const unread = data.filter(m => m.remitente === 'psicologa' && !m.leido).length;
   if (unread && !$('sec-m').classList.contains('on')) {
     $('rdot').classList.add('show'); $('bndot').classList.add('show');
   }
@@ -417,18 +448,29 @@ async function loadMsgs() {
 async function sendMsg() {
   const inp = $('msgInp'), txt = inp.value.trim(); if (!txt) return;
   inp.value = '';
-  await sb.from('mensajes').insert({ paciente_id:user.id, remitente:'paciente', contenido:txt });
+  const { error } = await sb.from('mensajes').insert({
+    paciente_id: user.id, remitente: 'paciente', contenido: txt
+  });
+  if (error) { console.error('Error enviando:', error); return; }
   loadMsgs();
 }
 
 async function markRead() {
-  await sb.from('mensajes').update({leido:true}).eq('paciente_id',user.id).eq('remitente','psicologa');
+  await sb.from('mensajes').update({ leido: true }).eq('paciente_id', user.id).eq('remitente', 'psicologa');
 }
 
+// ── REALTIME + POLLING RESPALDO ───────────────────────────────
 function subRT() {
-  sb.channel('pac-rt-'+user.id)
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'mensajes',filter:`paciente_id=eq.${user.id}`}, loadMsgs)
-    .subscribe();
+  // Realtime (requiere Publications activo en Supabase)
+  sb.channel('pac-rt-' + user.id)
+    .on('postgres_changes', {
+      event: 'INSERT', schema: 'public', table: 'mensajes',
+      filter: 'paciente_id=eq.' + user.id
+    }, () => loadMsgs())
+    .subscribe((status) => { console.log('Realtime paciente:', status); });
+
+  // Polling de respaldo cada 5 segundos
+  setInterval(loadMsgs, 5000);
 }
 </script>
 </body>

@@ -172,6 +172,15 @@
       .hchecks { grid-template-columns: repeat(3, 1fr); }
       .cgrid { gap: 2px; }
       .cday { min-height: 42px; padding: 4px; }
+      .login-wrap { padding: 0; align-items: flex-start; background: var(--surface); }
+      .lcard { border-radius: 0; box-shadow: none; border: none; max-width: 100%; padding: 2rem 1.25rem; min-height: calc(100vh - 54px); }
+      .fg input { padding: 13px; font-size: 1rem; }
+      .btn-full { padding: 14px; font-size: 1rem; }
+      .tc { padding: 0.875rem; }
+      .tact { gap: 5px; }
+      .bsm { padding: 6px 10px; font-size: 0.72rem; }
+      .pills { gap: 4px; }
+      .pill { padding: 5px 10px; font-size: 0.72rem; }
     }
   </style>
 </head>
@@ -453,72 +462,127 @@ function selDay(f, el) {
 }
 
 // ── MENSAJES ──────────────────────────────────────────────────
+let pollingInterval = null;
+
 async function loadMsgs() {
-  const { data: msgs } = await sb.from('mensajes').select('paciente_id,contenido,created_at,leido,remitente').order('created_at',{ascending:false});
-  if (!msgs?.length) { $('msgsSB').innerHTML='<div class="msgs-empty">Sin mensajes</div>'; return; }
+  const { data: msgs, error } = await sb.from('mensajes')
+    .select('paciente_id,contenido,created_at,leido,remitente')
+    .order('created_at',{ascending:false});
+
+  if (error) { console.error('Error cargando mensajes:', error); return; }
+  if (!msgs?.length) { $('msgsSB').innerHTML='<div class="msgs-empty">Sin mensajes aún</div>'; return; }
+
   const byP = {};
-  msgs.forEach(m=>{ if(!byP[m.paciente_id])byP[m.paciente_id]={msgs:[],unread:0}; byP[m.paciente_id].msgs.push(m); if(!m.leido&&m.remitente==='paciente')byP[m.paciente_id].unread++; });
+  msgs.forEach(m => {
+    if (!byP[m.paciente_id]) byP[m.paciente_id] = { msgs:[], unread:0 };
+    byP[m.paciente_id].msgs.push(m);
+    if (!m.leido && m.remitente === 'paciente') byP[m.paciente_id].unread++;
+  });
+
   const ids = Object.keys(byP);
-  const { data: pacs } = await sb.from('pacientes').select('user_id,nombre').in('user_id',ids);
-  const nm = {}; (pacs||[]).forEach(p=>nm[p.user_id]=p.nombre);
-  $('msgsSB').innerHTML = ids.map(pid=>{
-    const info=byP[pid], nom=nm[pid]||'Paciente';
-    return `<div class="pat ${selPat===pid?'on':''}" onclick="selPat2('${pid}','${nom.replace(/'/g,"\\'")}')">
+  const { data: pacs } = await sb.from('pacientes').select('user_id,nombre').in('user_id', ids);
+  const nm = {}; (pacs||[]).forEach(p => nm[p.user_id] = p.nombre);
+
+  $('msgsSB').innerHTML = ids.map(pid => {
+    const info = byP[pid], nom = nm[pid] || 'Paciente';
+    const esc_nom = nom.replace(/'/g, "\\'");
+    return `<div class="pat ${selPat===pid?'on':''}" onclick="selPat2('${pid}','${esc_nom}')">
       <div class="av" style="width:30px;height:30px;font-size:.72rem;flex-shrink:0">${ini(nom)}</div>
       <div style="min-width:0;flex:1"><div class="pnm">${esc(nom)}</div><div class="pprev">${esc(info.msgs[0]?.contenido||'')}</div></div>
-      ${info.unread?`<span class="unread">${info.unread}</span>`:''}
+      ${info.unread ? `<span class="unread">${info.unread}</span>` : ''}
     </div>`;
   }).join('');
-  const totalU = Object.values(byP).reduce((s,x)=>s+x.unread,0);
-  ['rdotM','bndotM'].forEach(id=>{ const el=$(id); if(el)el.classList.toggle('show',totalU>0); });
+
+  const totalU = Object.values(byP).reduce((s,x) => s+x.unread, 0);
+  ['rdotM','bndotM'].forEach(id => { const el=$(id); if(el) el.classList.toggle('show', totalU>0); });
 }
 
 async function selPat2(pid, nom) {
   selPat = pid;
+  // Marcar como leídos
   await sb.from('mensajes').update({leido:true}).eq('paciente_id',pid).eq('remitente','paciente');
-  const { data: msgs } = await sb.from('mensajes').select('*').eq('paciente_id',pid).order('created_at',{ascending:true});
+
+  const { data: msgs, error } = await sb.from('mensajes')
+    .select('*').eq('paciente_id',pid).order('created_at',{ascending:true});
+
+  if (error) { console.error('Error cargando chat:', error); return; }
+
+  const esc_nom = nom.replace(/'/g, "\\'");
   $('msgsChat').innerHTML = `
     <div class="chat-h">${esc(nom)}</div>
-    <div class="chat-msgs" id="chatMsgsA">${(msgs||[]).map(m=>{const ip=m.remitente==='psicologa'; return `<div><div class="msg ${ip?'msg-me':'msg-oth'}">${esc(m.contenido)}</div><div class="msg-t" style="text-align:${ip?'right':'left'}">${fmtT(m.created_at)}</div></div>`;}).join('')||'<div class="msgs-empty">Sin mensajes todavía.</div>'}</div>
+    <div class="chat-msgs" id="chatMsgsA">
+      ${(msgs||[]).map(m => {
+        const ip = m.remitente === 'psicologa';
+        return `<div>
+          <div class="msg ${ip?'msg-me':'msg-oth'}">${esc(m.contenido)}</div>
+          <div class="msg-t" style="text-align:${ip?'right':'left'}">${fmtT(m.created_at)}</div>
+        </div>`;
+      }).join('') || '<div class="msgs-empty">Sin mensajes todavía.</div>'}
+    </div>
     <div class="chat-in">
-      <textarea class="cinp" id="adMsgIn" placeholder="Responder a ${esc(nom)}..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAdMsg('${pid}','${nom.replace(/'/g,"\\'")}')}"></textarea>
-      <button class="csend" onclick="sendAdMsg('${pid}','${nom.replace(/'/g,"\\'")}')}">➤</button>
+      <textarea class="cinp" id="adMsgIn" placeholder="Responder a ${esc(nom)}..." rows="1"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAdMsg('${pid}','${esc_nom}')}"></textarea>
+      <button class="csend" onclick="sendAdMsg('${pid}','${esc_nom}')">➤</button>
     </div>`;
-  const mc=$('chatMsgsA'); if(mc)mc.scrollTop=mc.scrollHeight;
+
+  const mc = $('chatMsgsA'); if (mc) mc.scrollTop = mc.scrollHeight;
+
+  // Iniciar polling de respaldo cada 4 segundos para este chat
+  if (pollingInterval) clearInterval(pollingInterval);
+  pollingInterval = setInterval(() => refreshChat(pid, nom), 4000);
+
   loadMsgs();
 }
 
+// Actualiza solo los mensajes del chat abierto sin redibujar todo
+async function refreshChat(pid, nom) {
+  if (selPat !== pid) { clearInterval(pollingInterval); return; }
+  const { data: msgs } = await sb.from('mensajes')
+    .select('*').eq('paciente_id',pid).order('created_at',{ascending:true});
+  if (!msgs) return;
+  const mc = $('chatMsgsA'); if (!mc) return;
+  const wasAtBottom = mc.scrollHeight - mc.scrollTop - mc.clientHeight < 60;
+  mc.innerHTML = (msgs||[]).map(m => {
+    const ip = m.remitente === 'psicologa';
+    return `<div>
+      <div class="msg ${ip?'msg-me':'msg-oth'}">${esc(m.contenido)}</div>
+      <div class="msg-t" style="text-align:${ip?'right':'left'}">${fmtT(m.created_at)}</div>
+    </div>`;
+  }).join('') || '<div class="msgs-empty">Sin mensajes todavía.</div>';
+  if (wasAtBottom) mc.scrollTop = mc.scrollHeight;
+  loadMsgs(); // actualizar sidebar también
+}
+
 async function sendAdMsg(pid, nom) {
-  const inp=$('adMsgIn'); if(!inp)return; const txt=inp.value.trim(); if(!txt)return;
-  inp.value='';
-  await sb.from('mensajes').insert({paciente_id:pid,remitente:'psicologa',contenido:txt});
-  selPat2(pid,nom);
+  const inp = $('adMsgIn'); if (!inp) return;
+  const txt = inp.value.trim(); if (!txt) return;
+  inp.value = '';
+  const { error } = await sb.from('mensajes').insert({
+    paciente_id: pid, remitente: 'psicologa', contenido: txt
+  });
+  if (error) { console.error('Error enviando mensaje:', error); return; }
+  // Actualizar chat inmediatamente
+  refreshChat(pid, nom);
 }
 
-// ── CONFIG ────────────────────────────────────────────────────
-function buildHChecks() {
-  $('hchecks').innerHTML = HORAS.map(h=>`<label class="hchk"><input type="checkbox" value="${h}" checked> ${h}</label>`).join('');
-}
-
-async function loadCfg() {
-  const { data } = await sb.from('config').select('*').single();
-  if (!data) return;
-  if(data.cbu)           $('cCBU').value   = data.cbu;
-  if(data.alias)         $('cAlias').value = data.alias;
-  if(data.titular)       $('cTit').value   = data.titular;
-  if(data.wsp_psicologa) $('cWsp').value   = data.wsp_psicologa;
-  if(data.horarios)      document.querySelectorAll('#hchecks input').forEach(cb=>{ cb.checked=data.horarios.includes(cb.value); });
-}
-
-async function saveCfg() {
-  const horarios = [...document.querySelectorAll('#hchecks input:checked')].map(c=>c.value);
-  const { error } = await sb.from('config').upsert({id:1, cbu:$('cCBU').value.trim(), alias:$('cAlias').value.trim(), titular:$('cTit').value.trim(), wsp_psicologa:$('cWsp').value.trim(), horarios});
-  const ok=$('cfgOk'); ok.style.display=error?'none':'block'; if(!error)setTimeout(()=>{ok.style.display='none';},2500);
-}
-
-// ── REALTIME ──────────────────────────────────────────────────
+// ── REALTIME + POLLING ───────────────────────────────────────
 function subRT() {
-  sb.channel('admin-rt').on('postgres_changes',{event:'*',schema:'public',table:'turnos'},loadAll).on('postgres_changes',{event:'INSERT',schema:'public',table:'mensajes'},()=>{loadMsgs();if(selPat)selPat2(selPat,'');}).subscribe();
+  sb.channel('admin-rt')
+    .on('postgres_changes', {event:'*', schema:'public', table:'turnos'}, loadAll)
+    .on('postgres_changes', {event:'INSERT', schema:'public', table:'mensajes'}, () => {
+      loadMsgs();
+      if (selPat) refreshChat(selPat, '');
+    })
+    .subscribe((status) => { console.log('Realtime admin:', status); });
+
+  // Polling de respaldo mensajes cada 5 segundos
+  setInterval(() => {
+    loadMsgs();
+    if (selPat) refreshChat(selPat, '');
+  }, 5000);
+
+  // Polling turnos cada 15 segundos
+  setInterval(loadAll, 15000);
 }
 </script>
 </body>

@@ -87,14 +87,31 @@
 
     /* RESPONSIVE */
     @media (max-width: 680px) {
-      .wrap { grid-template-columns: 1fr; }
+      .wrap { grid-template-columns: 1fr; min-height: 100vh; }
       .left { display: none; }
-      .right { min-height: 100vh; align-items: flex-start; padding: 1.5rem 1rem; background: var(--warm); }
-      .card { border-radius: 16px; padding: 1.75rem 1.25rem; box-shadow: none; border: none; background: var(--surface); max-width: 100%; }
-      /* Show mini brand on mobile */
-      .mobile-brand { display: flex; align-items: center; gap: 8px; margin-bottom: 1.5rem; }
+      .right {
+        min-height: 100vh;
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding: 0;
+        background: var(--surface);
+      }
+      .card {
+        border-radius: 0;
+        padding: 2rem 1.25rem 2rem;
+        box-shadow: none;
+        border: none;
+        background: var(--surface);
+        max-width: 100%;
+        min-height: 100vh;
+      }
+      .mobile-brand { display: flex; align-items: center; gap: 8px; margin-bottom: 2rem; }
       .mobile-brand .brand-dot { width: 9px; height: 9px; background: var(--sage); border-radius: 50%; }
       .mobile-brand span { font-weight: 500; font-size: 0.9rem; }
+      /* Bigger touch targets on mobile */
+      .fg input { padding: 13px; font-size: 1rem; }
+      .btn { padding: 14px; font-size: 1rem; }
+      .btn-google { padding: 13px; font-size: 0.9rem; }
     }
     @media (min-width: 681px) { .mobile-brand { display: none; } }
   </style>
