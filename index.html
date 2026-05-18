@@ -8,231 +8,289 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { font-size: 15px; }
-    body { font-family: 'DM Sans', sans-serif; background: #f7f5f0; min-height: 100vh; color: #2c2c2c; -webkit-font-smoothing: antialiased; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'DM Sans', sans-serif; color: #2c2c2c;
+      -webkit-font-smoothing: antialiased;
+      visibility: hidden; /* oculto hasta saber si hay sesión */
+    }
+    body.ready { visibility: visible; animation: fadeIn .2s ease; }
+    @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
+
     :root {
-      --sage: #7a9e8e; --sage-deep: #4d7a68; --sage-light: #eaf2ee; --sage-mid: #c2d9cf;
-      --warm: #f7f5f0; --rose: #c47b7b; --rose-light: #f7eded;
-      --surface: #fff; --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.14);
-      --text: #2c2c2c; --text2: #6b6b6b; --text3: #a0a0a0;
-      --r: 14px; --rs: 9px;
+      --g1: #4d7a68; --g2: #3a6050; --g3: #2d4f42;
+      --sage: #7a9e8e; --sage-l: #eaf2ee; --sage-m: #c2d9cf;
+      --warm: #f0ede6;
+      --rose: #c47b7b; --rose-l: #f7eded;
+      --surf: #fff; --bord: rgba(0,0,0,0.09); --bord2: rgba(0,0,0,0.15);
+      --t1: #2c2c2c; --t2: #6b6b6b; --t3: #aaa;
+      --rs: 10px;
     }
 
-    /* LAYOUT */
+    /* ── DESKTOP LAYOUT ── */
     .wrap { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
 
-    /* LEFT PANEL */
-    .left {
-      background: var(--sage-light); padding: 3rem;
-      display: flex; flex-direction: column; justify-content: space-between;
+    .hero {
+      background: linear-gradient(155deg, var(--g1) 0%, var(--g2) 50%, var(--g3) 100%);
+      padding: 3rem; display: flex; flex-direction: column; justify-content: space-between;
       position: relative; overflow: hidden;
     }
-    .left::before {
+    .hero::after {
       content: ''; position: absolute;
-      width: 360px; height: 360px;
-      background: radial-gradient(circle, var(--sage-mid) 0%, transparent 70%);
-      bottom: -90px; right: -70px; pointer-events: none;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(194,217,207,.22) 0%, transparent 65%);
+      bottom: -150px; right: -100px; pointer-events: none;
     }
-    .brand { display: flex; align-items: center; gap: 9px; z-index: 1; }
-    .brand-dot { width: 10px; height: 10px; background: var(--sage); border-radius: 50%; }
-    .brand-name { font-weight: 500; font-size: 0.9rem; }
-    .copy { z-index: 1; }
-    .copy h1 { font-family: 'DM Serif Display', serif; font-size: 2.8rem; line-height: 1.15; font-weight: 400; margin-bottom: 1rem; }
-    .copy h1 em { font-style: italic; color: var(--sage-deep); }
-    .copy p { color: var(--text2); line-height: 1.65; max-width: 300px; }
-    .deco { width: 90px; height: 90px; border: 2px solid var(--sage-mid); border-radius: 50%; align-self: flex-end; opacity: 0.45; }
+    .h-brand { display: flex; align-items: center; gap: 8px; z-index: 1; }
+    .h-dot { width: 8px; height: 8px; background: rgba(255,255,255,.6); border-radius: 50%; }
+    .h-name { color: rgba(255,255,255,.75); font-size: .875rem; font-weight: 500; }
+    .h-copy { z-index: 1; }
+    .h-copy h1 {
+      font-family: 'DM Serif Display', serif; font-size: 3rem; font-weight: 400;
+      color: #fff; line-height: 1.12; margin-bottom: 1.25rem;
+    }
+    .h-copy h1 em { font-style: italic; color: var(--sage-m); }
+    .h-copy p { color: rgba(255,255,255,.6); line-height: 1.7; max-width: 290px; font-size: .95rem; }
+    .h-tags { display: flex; gap: 10px; align-self: flex-end; z-index: 1; }
+    .h-tag {
+      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15);
+      border-radius: 20px; padding: 7px 14px; font-size: .78rem; color: rgba(255,255,255,.7);
+    }
 
-    /* RIGHT / AUTH */
-    .right { display: flex; align-items: center; justify-content: center; padding: 2rem; background: var(--warm); }
-    .card { background: var(--surface); border-radius: 20px; padding: 2.25rem; width: 100%; max-width: 400px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); border: 1px solid var(--border); }
+    .auth-side {
+      background: var(--warm);
+      display: flex; align-items: center; justify-content: center; padding: 2rem;
+    }
+    .card {
+      background: var(--surf); border-radius: 20px; padding: 2.25rem;
+      width: 100%; max-width: 400px;
+      box-shadow: 0 4px 28px rgba(0,0,0,.08); border: 1px solid var(--bord);
+    }
 
-    /* TABS */
+    /* ── FORM ELEMENTS ── */
     .tabs { display: flex; background: var(--warm); border-radius: var(--rs); padding: 4px; gap: 4px; margin-bottom: 1.5rem; }
-    .tab { flex: 1; padding: 8px; border: none; background: none; border-radius: 6px; font-size: 0.875rem; font-family: 'DM Sans', sans-serif; cursor: pointer; color: var(--text2); transition: all 0.15s; }
-    .tab.active { background: var(--surface); color: var(--text); font-weight: 500; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    .tab { flex: 1; padding: 8px; border: none; background: none; border-radius: 7px; font-size: .875rem; font-family: 'DM Sans', sans-serif; cursor: pointer; color: var(--t2); transition: all .15s; }
+    .tab.on { background: var(--surf); color: var(--t1); font-weight: 500; box-shadow: 0 1px 5px rgba(0,0,0,.09); }
 
-    /* FORM */
     .fg { margin-bottom: 1rem; }
-    .fg label { display: block; font-size: 0.72rem; color: var(--text2); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; }
+    .fg label { display: block; font-size: .7rem; color: var(--t2); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .06em; font-weight: 500; }
     .fg input {
-      width: 100%; padding: 11px 13px; border: 1px solid var(--border2);
-      border-radius: var(--rs); font-family: 'DM Sans', sans-serif;
-      font-size: 1rem; color: var(--text); background: var(--surface); outline: none;
-      transition: border-color 0.15s; -webkit-appearance: none; appearance: none;
+      width: 100%; padding: 12px 14px; border: 1px solid var(--bord2);
+      border-radius: var(--rs); font-family: 'DM Sans', sans-serif; font-size: 1rem;
+      color: var(--t1); background: var(--surf); outline: none;
+      transition: border-color .15s, box-shadow .15s;
+      -webkit-appearance: none;
     }
-    .fg input:focus { border-color: var(--sage); box-shadow: 0 0 0 3px rgba(122,158,142,0.12); }
+    .fg input:focus { border-color: var(--g1); box-shadow: 0 0 0 3px rgba(77,122,104,.1); }
 
-    .btn { width: 100%; padding: 13px; background: var(--sage-deep); color: white; border: none; border-radius: var(--rs); font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 500; cursor: pointer; transition: background 0.15s; -webkit-tap-highlight-color: transparent; }
-    .btn:hover { background: #3d6655; }
-    .btn:disabled { opacity: 0.6; cursor: default; }
-    .btn-google { width: 100%; padding: 12px; background: var(--surface); color: var(--text); border: 1px solid var(--border2); border-radius: var(--rs); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: background 0.12s; -webkit-tap-highlight-color: transparent; }
-    .btn-google:hover { background: var(--warm); }
+    .btn-p {
+      width: 100%; padding: 13px; background: var(--g1); color: #fff;
+      border: none; border-radius: var(--rs); font-family: 'DM Sans', sans-serif;
+      font-size: 1rem; font-weight: 500; cursor: pointer; transition: background .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-p:hover { background: var(--g2); }
+    .btn-p:disabled { opacity: .55; cursor: default; }
 
-    .divider { text-align: center; margin: 1rem 0; position: relative; }
-    .divider::before { content: ''; position: absolute; left: 0; top: 50%; width: 100%; height: 1px; background: var(--border); }
-    .divider span { background: var(--surface); padding: 0 12px; position: relative; font-size: 0.8rem; color: var(--text3); }
+    .btn-g {
+      width: 100%; padding: 12px; background: var(--surf); color: var(--t1);
+      border: 1px solid var(--bord2); border-radius: var(--rs);
+      font-family: 'DM Sans', sans-serif; font-size: .9rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      transition: background .12s; -webkit-tap-highlight-color: transparent;
+    }
+    .btn-g:hover { background: var(--warm); }
 
-    .err { font-size: 0.82rem; color: var(--rose); background: var(--rose-light); padding: 9px 12px; border-radius: var(--rs); margin-bottom: 10px; display: none; }
-    .ok  { font-size: 0.82rem; color: var(--sage-deep); background: var(--sage-light); padding: 9px 12px; border-radius: var(--rs); margin-bottom: 10px; display: none; }
+    .sep { text-align: center; margin: 1rem 0; position: relative; }
+    .sep::before { content: ''; position: absolute; left: 0; top: 50%; width: 100%; height: 1px; background: var(--bord); }
+    .sep span { background: var(--surf); padding: 0 12px; position: relative; font-size: .78rem; color: var(--t3); }
 
-    .footer-link { text-align: center; font-size: 0.8rem; color: var(--text3); margin-top: 1.25rem; }
-    .footer-link a { color: var(--sage-deep); text-decoration: none; font-weight: 500; }
+    .err  { font-size: .82rem; color: var(--rose); background: var(--rose-l); padding: 9px 12px; border-radius: var(--rs); margin-bottom: 10px; display: none; }
+    .succ { font-size: .82rem; color: var(--g1); background: var(--sage-l); padding: 9px 12px; border-radius: var(--rs); margin-bottom: 10px; display: none; }
 
-    /* LOADING */
-    .overlay { display: none; position: fixed; inset: 0; background: rgba(247,245,240,0.9); align-items: center; justify-content: center; z-index: 999; flex-direction: column; gap: 12px; }
-    .overlay.on { display: flex; }
-    .spin { width: 28px; height: 28px; border: 2px solid var(--sage-mid); border-top-color: var(--sage-deep); border-radius: 50%; animation: spin 0.7s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .overlay p { font-size: 0.875rem; color: var(--text2); }
+    .foot { text-align: center; font-size: .8rem; color: var(--t3); margin-top: 1.25rem; }
+    .foot a { color: var(--g1); text-decoration: none; font-weight: 500; }
 
-    /* RESPONSIVE */
-    @media (max-width: 680px) {
-      .wrap { grid-template-columns: 1fr; min-height: 100vh; }
-      .left { display: none; }
-      .right {
-        min-height: 100vh;
-        align-items: flex-start;
-        justify-content: flex-start;
-        padding: 0;
-        background: var(--surface);
+    /* ── MOBILE ── */
+    @media (max-width: 700px) {
+      .wrap { grid-template-columns: 1fr; }
+      .hero { display: none; }
+
+      .auth-side {
+        min-height: 100vh; padding: 0;
+        align-items: flex-start; justify-content: flex-start;
+        background: var(--surf);
       }
       .card {
-        border-radius: 0;
-        padding: 2rem 1.25rem 2rem;
-        box-shadow: none;
-        border: none;
-        background: var(--surface);
-        max-width: 100%;
-        min-height: 100vh;
+        border-radius: 0; box-shadow: none; border: none;
+        padding: 0; max-width: 100%; width: 100%;
+        min-height: 100vh; display: flex; flex-direction: column;
       }
-      .mobile-brand { display: flex; align-items: center; gap: 8px; margin-bottom: 2rem; }
-      .mobile-brand .brand-dot { width: 9px; height: 9px; background: var(--sage); border-radius: 50%; }
-      .mobile-brand span { font-weight: 500; font-size: 0.9rem; }
-      /* Bigger touch targets on mobile */
-      .fg input { padding: 13px; font-size: 1rem; }
-      .btn { padding: 14px; font-size: 1rem; }
-      .btn-google { padding: 13px; font-size: 0.9rem; }
+
+      /* Cabecera verde curva */
+      .mob-top {
+        background: linear-gradient(155deg, var(--g1) 0%, var(--g2) 100%);
+        padding: 2.5rem 1.5rem 4rem;
+        position: relative; overflow: hidden; flex-shrink: 0;
+      }
+      .mob-top::before {
+        content: ''; position: absolute;
+        width: 300px; height: 300px;
+        background: radial-gradient(circle, rgba(194,217,207,.2) 0%, transparent 65%);
+        top: -80px; right: -60px; pointer-events: none;
+      }
+      .mob-top::after {
+        content: ''; position: absolute;
+        bottom: -2px; left: -5%; right: -5%; height: 50px;
+        background: var(--surf);
+        border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+      }
+      .mob-brand { display: flex; align-items: center; gap: 7px; margin-bottom: 1.25rem; z-index: 1; position: relative; }
+      .mob-brand .d { width: 7px; height: 7px; background: rgba(255,255,255,.6); border-radius: 50%; }
+      .mob-brand span { color: rgba(255,255,255,.75); font-size: .825rem; font-weight: 500; }
+      .mob-title { font-family: 'DM Serif Display', serif; font-size: 1.9rem; font-weight: 400; color: #fff; line-height: 1.15; position: relative; z-index: 1; }
+      .mob-title em { font-style: italic; color: var(--sage-m); }
+      .mob-sub { color: rgba(255,255,255,.6); font-size: .83rem; margin-top: .5rem; position: relative; z-index: 1; }
+
+      .mob-form { padding: 1.75rem 1.5rem 2rem; flex: 1; }
+      .tabs { background: #f0ede6; }
+      .sep span { background: var(--surf); }
+      .fg input { padding: 13px 14px; font-size: 1rem; }
+      .btn-p { padding: 14px; }
+      .btn-g { padding: 13px; }
     }
-    @media (min-width: 681px) { .mobile-brand { display: none; } }
+
+    @media (min-width: 701px) {
+      .mob-top { display: none; }
+      .mob-form { padding: 0; }
+    }
   </style>
 </head>
 <body>
 
-<div class="overlay" id="ov"><div class="spin"></div><p id="ovTxt">Cargando...</p></div>
-
 <div class="wrap">
-  <div class="left">
-    <div class="brand"><span class="brand-dot"></span><span class="brand-name">Consultorio</span></div>
-    <div class="copy">
+  <!-- HERO desktop -->
+  <div class="hero">
+    <div class="h-brand"><span class="h-dot"></span><span class="h-name">Consultorio</span></div>
+    <div class="h-copy">
       <h1>Un espacio<br><em>para vos.</em></h1>
       <p>Reservá tu turno de forma simple y segura. Te acompañamos en cada paso del proceso.</p>
     </div>
-    <div class="deco"></div>
+    <div class="h-tags">
+      <span class="h-tag">🌿 Psicología</span>
+      <span class="h-tag">📅 Turnos online</span>
+    </div>
   </div>
 
-  <div class="right">
+  <!-- AUTH -->
+  <div class="auth-side">
     <div class="card">
-      <div class="mobile-brand"><span class="brand-dot"></span><span>Consultorio</span></div>
 
-      <div class="tabs">
-        <button class="tab active" id="tLogin"    onclick="switchTab('login')">Ingresar</button>
-        <button class="tab"        id="tRegister" onclick="switchTab('register')">Crear cuenta</button>
+      <!-- Cabecera mobile -->
+      <div class="mob-top">
+        <div class="mob-brand"><span class="d"></span><span>Consultorio</span></div>
+        <div class="mob-title">Un espacio<br><em>para vos.</em></div>
+        <div class="mob-sub">Reservá tu turno de forma simple y segura.</div>
       </div>
 
-      <!-- LOGIN -->
-      <div id="fLogin">
-        <div class="err" id="eLogin"></div>
-        <div class="fg"><label>Email</label><input type="email" id="lEmail" placeholder="tu@email.com" autocomplete="email" inputmode="email"></div>
-        <div class="fg"><label>Contraseña</label><input type="password" id="lPass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
-        <button class="btn" id="btnLogin" onclick="doLogin()">Ingresar</button>
-        <div class="divider"><span>o</span></div>
-        <button class="btn-google" onclick="doGoogle()">
-          <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
-          Continuar con Google
-        </button>
-      </div>
+      <div class="mob-form">
+        <div class="tabs">
+          <button class="tab on" id="tL" onclick="sw('login')">Ingresar</button>
+          <button class="tab"    id="tR" onclick="sw('reg')">Crear cuenta</button>
+        </div>
 
-      <!-- REGISTER -->
-      <div id="fReg" style="display:none">
-        <div class="err" id="eReg"></div>
-        <div class="ok"  id="okReg"></div>
-        <div class="fg"><label>Nombre completo</label><input type="text" id="rNombre" placeholder="María González" autocomplete="name"></div>
-        <div class="fg"><label>WhatsApp</label><input type="tel" id="rTel" placeholder="1165432100" inputmode="tel" autocomplete="tel"></div>
-        <div class="fg"><label>Email</label><input type="email" id="rEmail" placeholder="tu@email.com" autocomplete="email" inputmode="email"></div>
-        <div class="fg"><label>Contraseña</label><input type="password" id="rPass" placeholder="Mínimo 6 caracteres" autocomplete="new-password"></div>
-        <button class="btn" id="btnReg" onclick="doRegister()">Crear cuenta</button>
-        <div class="divider"><span>o</span></div>
-        <button class="btn-google" onclick="doGoogle()">
-          <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
-          Registrarse con Google
-        </button>
-      </div>
+        <!-- LOGIN -->
+        <div id="fL">
+          <div class="err" id="eL"></div>
+          <div class="fg"><label>Email</label><input type="email" id="lEmail" placeholder="tu@email.com" autocomplete="email" inputmode="email"></div>
+          <div class="fg"><label>Contraseña</label><input type="password" id="lPass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+          <button class="btn-p" id="btnL" onclick="doLogin()">Ingresar</button>
+          <div class="sep"><span>o</span></div>
+          <button class="btn-g" onclick="doGoogle()">
+            <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+            Continuar con Google
+          </button>
+        </div>
 
-      <p class="footer-link">¿Sos la psicóloga? <a href="admin.html">Ingresá acá →</a></p>
+        <!-- REGISTER -->
+        <div id="fR" style="display:none">
+          <div class="err" id="eR"></div>
+          <div class="succ" id="okR"></div>
+          <div class="fg"><label>Nombre completo</label><input type="text" id="rNom" placeholder="María González" autocomplete="name"></div>
+          <div class="fg"><label>WhatsApp</label><input type="tel" id="rTel" placeholder="1165432100" inputmode="tel" autocomplete="tel"></div>
+          <div class="fg"><label>Email</label><input type="email" id="rEmail" placeholder="tu@email.com" autocomplete="email" inputmode="email"></div>
+          <div class="fg"><label>Contraseña</label><input type="password" id="rPass" placeholder="Mínimo 6 caracteres" autocomplete="new-password"></div>
+          <button class="btn-p" id="btnR" onclick="doReg()">Crear cuenta</button>
+          <div class="sep"><span>o</span></div>
+          <button class="btn-g" onclick="doGoogle()">
+            <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+            Registrarse con Google
+          </button>
+        </div>
+
+        <p class="foot">¿Sos la psicóloga? <a href="admin.html">Ingresá acá →</a></p>
+      </div>
     </div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
-const SURL = 'https://dzvfjedtjhlvwipnxzmi.supabase.co';
-const SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6dmZqZWR0amhsdndpcG54em1pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5NDc2NTMsImV4cCI6MjA5NDUyMzY1M30.5JcK7Ll67WIFoTY6Z00qiOEEbzh8nC3y1lmiBkuo8zU';
+const SURL  = 'https://dzvfjedtjhlvwipnxzmi.supabase.co';
+const SKEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6dmZqZWR0amhsdndpcG54em1pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5NDc2NTMsImV4cCI6MjA5NDUyMzY1M30.5JcK7Ll67WIFoTY6Z00qiOEEbzh8nC3y1lmiBkuo8zU';
 const ADMIN = 'gracielacolli@hotmail.com';
 const sb = supabase.createClient(SURL, SKEY);
-const $ = id => document.getElementById(id);
+const $  = id => document.getElementById(id);
 
-function ov(t) { $('ovTxt').textContent = t; $('ov').classList.add('on'); }
-function offOv() { $('ov').classList.remove('on'); }
-function goAfter(u) { window.location.replace(u.email === ADMIN ? 'admin.html' : 'paciente.html'); }
+function go(u) { window.location.replace(u.email === ADMIN ? 'admin.html' : 'paciente.html'); }
+function showE(id,m) { const e=$(id); e.textContent=m; e.style.display='block'; }
+function showOk(id,m) { const e=$(id); e.textContent=m; e.style.display='block'; }
 
-ov('Verificando sesión...');
+// Verificar sesión ANTES de mostrar cualquier cosa
 sb.auth.getSession().then(({ data }) => {
-  if (data.session) goAfter(data.session.user); else offOv();
-}).catch(offOv);
+  if (data.session) { go(data.session.user); }
+  else { document.body.classList.add('ready'); }
+}).catch(() => document.body.classList.add('ready'));
 
-function switchTab(t) {
-  $('fLogin').style.display  = t === 'login' ? 'block' : 'none';
-  $('fReg').style.display    = t === 'register' ? 'block' : 'none';
-  $('tLogin').classList.toggle('active', t === 'login');
-  $('tRegister').classList.toggle('active', t === 'register');
-  $('eLogin').style.display = $('eReg').style.display = $('okReg').style.display = 'none';
+function sw(t) {
+  $('fL').style.display = t==='login' ? 'block' : 'none';
+  $('fR').style.display = t==='reg'   ? 'block' : 'none';
+  $('tL').classList.toggle('on', t==='login');
+  $('tR').classList.toggle('on', t==='reg');
+  ['eL','eR','okR'].forEach(id => $( id).style.display='none');
 }
 
 async function doLogin() {
-  const email = $('lEmail').value.trim(), pass = $('lPass').value;
-  $('eLogin').style.display = 'none';
-  if (!email || !pass) { showE('eLogin','Completá email y contraseña.'); return; }
-  const btn = $('btnLogin'); btn.disabled = true; btn.textContent = 'Ingresando...';
-  ov('Ingresando...');
-  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
-  if (error) { offOv(); btn.disabled = false; btn.textContent = 'Ingresar'; showE('eLogin', 'Email o contraseña incorrectos.'); return; }
-  goAfter(data.user);
+  const email=$('lEmail').value.trim(), pass=$('lPass').value;
+  $('eL').style.display='none';
+  if (!email||!pass) { showE('eL','Completá email y contraseña.'); return; }
+  const b=$('btnL'); b.disabled=true; b.textContent='Ingresando...';
+  const { data, error } = await sb.auth.signInWithPassword({ email, password:pass });
+  if (error) { b.disabled=false; b.textContent='Ingresar'; showE('eL','Email o contraseña incorrectos.'); return; }
+  go(data.user);
 }
 
-async function doRegister() {
-  const nombre = $('rNombre').value.trim(), tel = $('rTel').value.trim(),
-        email  = $('rEmail').value.trim(),  pass = $('rPass').value;
-  $('eReg').style.display = $('okReg').style.display = 'none';
-  if (!nombre || !email || !pass) { showE('eReg','Completá nombre, email y contraseña.'); return; }
-  if (pass.length < 6) { showE('eReg','La contraseña necesita al menos 6 caracteres.'); return; }
-  const btn = $('btnReg'); btn.disabled = true; btn.textContent = 'Creando cuenta...';
-  ov('Creando cuenta...');
-  const { data, error } = await sb.auth.signUp({ email, password: pass, options: { data: { nombre, tel } } });
-  if (error) { offOv(); btn.disabled = false; btn.textContent = 'Crear cuenta'; showE('eReg', error.message); return; }
-  if (data.user) await sb.from('pacientes').upsert({ user_id: data.user.id, nombre, tel, email });
-  offOv(); btn.disabled = false; btn.textContent = 'Crear cuenta';
-  if (data.session) { goAfter(data.user); return; }
-  showOk('okReg', '✓ Cuenta creada. Revisá tu email para confirmarla y luego ingresá.');
+async function doReg() {
+  const nom=$('rNom').value.trim(), tel=$('rTel').value.trim(),
+        email=$('rEmail').value.trim(), pass=$('rPass').value;
+  ['eR','okR'].forEach(id=>$( id).style.display='none');
+  if (!nom||!email||!pass) { showE('eR','Completá nombre, email y contraseña.'); return; }
+  if (pass.length<6) { showE('eR','La contraseña necesita al menos 6 caracteres.'); return; }
+  const b=$('btnR'); b.disabled=true; b.textContent='Creando cuenta...';
+  const { data, error } = await sb.auth.signUp({ email, password:pass, options:{data:{nombre:nom,tel}} });
+  if (error) { b.disabled=false; b.textContent='Crear cuenta'; showE('eR',error.message); return; }
+  if (data.user) await sb.from('pacientes').upsert({user_id:data.user.id,nombre:nom,tel,email});
+  b.disabled=false; b.textContent='Crear cuenta';
+  if (data.session) { go(data.user); return; }
+  showOk('okR','✓ Cuenta creada. Revisá tu email para confirmarla y luego ingresá.');
 }
 
 async function doGoogle() {
-  ov('Conectando con Google...');
-  const { error } = await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + '/paciente.html' } });
-  if (error) { offOv(); alert('Error con Google: ' + error.message); }
+  await sb.auth.signInWithOAuth({
+    provider:'google',
+    options:{ redirectTo: window.location.origin+'/paciente.html' }
+  });
 }
-
-function showE(id, msg) { const el=$(id); el.textContent=msg; el.style.display='block'; }
-function showOk(id, msg) { const el=$(id); el.textContent=msg; el.style.display='block'; }
 </script>
 </body>
 </html>

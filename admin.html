@@ -8,206 +8,323 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'DM Sans', sans-serif; background: #f7f5f0; min-height: 100vh; color: #2c2c2c; -webkit-font-smoothing: antialiased; font-size: 14px; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'DM Sans', sans-serif; background: #f0ede6;
+      color: #2c2c2c; -webkit-font-smoothing: antialiased;
+      visibility: hidden; font-size: 14px;
+    }
+    body.ready { visibility: visible; animation: fi .2s ease; }
+    @keyframes fi { from{opacity:0} to{opacity:1} }
+
     :root {
-      --sage: #7a9e8e; --sage-deep: #4d7a68; --sage-light: #eaf2ee; --sage-mid: #c2d9cf;
-      --warm: #f7f5f0; --warm2: #ede9e1; --rose: #c47b7b; --rose-light: #f7eded;
-      --amber-l: #fdf4e7; --blue-l: #eaf0fb; --blue-t: #2a4a8a;
-      --surface: #fff; --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.14);
-      --text: #2c2c2c; --text2: #6b6b6b; --text3: #a0a0a0; --r: 12px; --rs: 9px;
+      --g1: #4d7a68; --g2: #3a6050; --g3: #2d4f42;
+      --sage: #7a9e8e; --sl: #eaf2ee; --sm: #c2d9cf;
+      --warm: #f0ede6; --warm2: #e8e3d8;
+      --rose: #c47b7b; --rl: #f7eded;
+      --amb: #c49b5a; --al: #fdf4e7; --bl: #eaf0fb; --bt: #2a4a8a;
+      --surf: #fff; --bord: rgba(0,0,0,.09); --bord2: rgba(0,0,0,.15);
+      --t1: #2c2c2c; --t2: #6b6b6b; --t3: #aaa;
+      --r: 12px; --rs: 9px;
     }
 
-    /* NAV */
-    .topnav { height: 54px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 1.25rem; position: sticky; top: 0; z-index: 40; }
-    .brand { display: flex; align-items: center; gap: 8px; }
-    .brand-dot { width: 9px; height: 9px; background: var(--sage); border-radius: 50%; }
-    .brand-name { font-weight: 500; font-size: 0.875rem; }
-    .nav-out { padding: 6px 14px; border: 1px solid var(--border2); border-radius: 20px; background: none; font-size: 0.775rem; cursor: pointer; color: var(--text2); font-family: 'DM Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+    /* ── NAV ── */
+    .nav {
+      height: 54px; background: var(--surf); border-bottom: 1px solid var(--bord);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 1.25rem; position: sticky; top: 0; z-index: 40;
+    }
+    .nav-brand { display: flex; align-items: center; gap: 8px; }
+    .nav-dot { width: 8px; height: 8px; background: var(--sage); border-radius: 50%; }
+    .nav-name { font-weight: 500; font-size: .875rem; }
+    .nav-out {
+      padding: 6px 14px; border: 1px solid var(--bord2); border-radius: 20px;
+      background: none; font-size: .775rem; cursor: pointer; color: var(--t2);
+      font-family: 'DM Sans', sans-serif; -webkit-tap-highlight-color: transparent;
+    }
 
-    /* LAYOUT */
+    /* ── LOGIN PAGE ── */
+    .login-page {
+      display: none; min-height: calc(100vh - 54px);
+      background: var(--warm);
+    }
+    /* Mobile: pantalla completa verde como index */
+    .login-inner {
+      display: flex; align-items: center; justify-content: center;
+      padding: 2rem; min-height: calc(100vh - 54px);
+    }
+    .login-card {
+      background: var(--surf); border-radius: 20px; padding: 2.25rem;
+      width: 100%; max-width: 380px;
+      box-shadow: 0 4px 28px rgba(0,0,0,.08); border: 1px solid var(--bord);
+    }
+    .login-logo {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--sl); color: var(--g1);
+      font-family: 'DM Serif Display', serif; font-size: 1.5rem;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem;
+    }
+    .login-card h2 {
+      text-align: center; font-family: 'DM Serif Display', serif;
+      font-size: 1.2rem; font-weight: 400; margin-bottom: 1.5rem; color: var(--t1);
+    }
+    .fg { margin-bottom: 1rem; }
+    .fg label { display: block; font-size: .7rem; color: var(--t2); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .06em; font-weight: 500; }
+    .fg input {
+      width: 100%; padding: 12px 14px; border: 1px solid var(--bord2);
+      border-radius: var(--rs); font-family: 'DM Sans', sans-serif; font-size: 1rem;
+      color: var(--t1); background: var(--surf); outline: none;
+      transition: border-color .15s; -webkit-appearance: none;
+    }
+    .fg input:focus { border-color: var(--g1); box-shadow: 0 0 0 3px rgba(77,122,104,.1); }
+    .btn-p {
+      width: 100%; padding: 13px; background: var(--g1); color: #fff;
+      border: none; border-radius: var(--rs); font-family: 'DM Sans', sans-serif;
+      font-size: 1rem; font-weight: 500; cursor: pointer; transition: background .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-p:hover { background: var(--g2); }
+    .login-back { text-align: center; font-size: .78rem; color: var(--t3); margin-top: 1rem; }
+    .login-back a { color: var(--g1); text-decoration: none; }
+    .lerr { font-size: .82rem; color: var(--rose); background: var(--rl); padding: 9px 12px; border-radius: var(--rs); margin-bottom: 10px; display: none; }
+
+    /* ── PANEL ── */
+    #panelSec { display: none; }
     .layout { display: flex; min-height: calc(100vh - 54px); }
-    .sidebar { width: 192px; background: var(--surface); border-right: 1px solid var(--border); padding: 1.25rem 0.75rem; display: flex; flex-direction: column; gap: 3px; flex-shrink: 0; }
-    .sb { display: flex; align-items: center; gap: 9px; padding: 10px 11px; border: none; background: none; border-radius: var(--rs); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; color: var(--text2); cursor: pointer; text-align: left; width: 100%; transition: all 0.12s; position: relative; -webkit-tap-highlight-color: transparent; }
-    .sb:hover { background: var(--warm); color: var(--text); }
-    .sb.on { background: var(--sage-light); color: var(--sage-deep); font-weight: 500; }
+
+    /* Sidebar desktop */
+    .sidebar {
+      width: 190px; background: var(--surf); border-right: 1px solid var(--bord);
+      padding: 1.25rem .75rem; display: flex; flex-direction: column; gap: 3px; flex-shrink: 0;
+    }
+    .sb {
+      display: flex; align-items: center; gap: 9px; padding: 10px 11px;
+      border: none; background: none; border-radius: var(--rs);
+      font-family: 'DM Sans', sans-serif; font-size: .85rem; color: var(--t2);
+      cursor: pointer; text-align: left; width: 100%; transition: all .12s;
+      position: relative; -webkit-tap-highlight-color: transparent;
+    }
+    .sb:hover { background: var(--warm); color: var(--t1); }
+    .sb.on { background: var(--sl); color: var(--g1); font-weight: 500; }
     .rdot { width: 7px; height: 7px; background: var(--rose); border-radius: 50%; margin-left: auto; display: none; }
     .rdot.show { display: block; }
 
-    /* BOTTOM NAV mobile */
-    .botnav { display: none; position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: var(--surface); border-top: 1px solid var(--border); z-index: 40; }
+    /* Bottom nav mobile */
+    .botnav {
+      display: none; position: fixed; bottom: 0; left: 0; right: 0;
+      height: 60px; background: var(--surf); border-top: 1px solid var(--bord); z-index: 40;
+    }
     .botnav-inner { display: flex; height: 100%; }
-    .bnb { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border: none; background: none; font-family: 'DM Sans', sans-serif; font-size: 0.58rem; color: var(--text3); cursor: pointer; position: relative; -webkit-tap-highlight-color: transparent; transition: color 0.12s; }
-    .bnb.on { color: var(--sage-deep); }
+    .bnb {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 2px; border: none; background: none; font-family: 'DM Sans', sans-serif;
+      font-size: .58rem; color: var(--t3); cursor: pointer; position: relative;
+      -webkit-tap-highlight-color: transparent; transition: color .12s;
+    }
+    .bnb.on { color: var(--g1); }
     .bnb-ico { font-size: 1.2rem; }
     .bndot { position: absolute; top: 7px; right: calc(50% - 16px); width: 7px; height: 7px; background: var(--rose); border-radius: 50%; display: none; }
     .bndot.show { display: block; }
 
-    /* MAIN */
+    /* Main content */
     .main { flex: 1; padding: 1.5rem; overflow-y: auto; min-width: 0; }
     .sec { display: none; }
     .sec.on { display: block; }
     .sh { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 8px; }
     .sh h2 { font-family: 'DM Serif Display', serif; font-size: 1.4rem; font-weight: 400; }
-    .sh-sub { font-size: 0.8rem; color: var(--text2); margin-top: 3px; }
 
     /* CALENDAR */
     .cal-nav-wrap { display: flex; gap: 6px; }
-    .cnav { width: 30px; height: 30px; border: 1px solid var(--border2); border-radius: var(--rs); background: var(--surface); cursor: pointer; font-size: 0.9rem; -webkit-tap-highlight-color: transparent; }
-    .cgrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-bottom: 10px; }
-    .cdow { text-align: center; font-size: 0.68rem; color: var(--text3); font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; padding: 5px 0; }
-    .cday { background: var(--surface); border: 1px solid var(--border); border-radius: var(--rs); padding: 5px; min-height: 52px; cursor: pointer; transition: all 0.12s; -webkit-tap-highlight-color: transparent; }
-    .cday:hover { border-color: var(--sage-mid); background: var(--sage-light); }
-    .cday.om { opacity: 0.25; pointer-events: none; }
-    .cday.hoy { border-color: var(--sage); }
-    .cday.has { background: var(--sage-light); }
-    .cday.sel { border-color: var(--sage-deep); box-shadow: 0 0 0 2px rgba(77,122,104,0.15); }
-    .cdn { font-size: 0.75rem; font-weight: 500; margin-bottom: 2px; }
-    .cday.hoy .cdn { background: var(--sage-deep); color: #fff; width: 19px; height: 19px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; }
+    .cnav { width: 30px; height: 30px; border: 1px solid var(--bord2); border-radius: var(--rs); background: var(--surf); cursor: pointer; font-size: .9rem; -webkit-tap-highlight-color: transparent; }
+    .cgrid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; margin-bottom: 10px; }
+    .cdow { text-align: center; font-size: .68rem; color: var(--t3); font-weight: 500; text-transform: uppercase; letter-spacing: .04em; padding: 5px 0; }
+    .cday { background: var(--surf); border: 1px solid var(--bord); border-radius: var(--rs); padding: 5px; min-height: 52px; cursor: pointer; transition: all .12s; -webkit-tap-highlight-color: transparent; }
+    .cday:hover { border-color: var(--sm); background: var(--sl); }
+    .cday.om { opacity: .25; pointer-events: none; }
+    .cday.hoy { border-color: var(--g1); }
+    .cday.has { background: var(--sl); }
+    .cday.sel { border-color: var(--g1); box-shadow: 0 0 0 2px rgba(77,122,104,.15); }
+    .cdn { font-size: .75rem; font-weight: 500; margin-bottom: 2px; }
+    .cday.hoy .cdn { background: var(--g1); color: #fff; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .68rem; }
     .cdots { display: flex; gap: 2px; flex-wrap: wrap; }
     .cdot { width: 5px; height: 5px; border-radius: 50%; }
-    .dp { background: #c49b5a; } .dc { background: var(--sage); }
-    .cdet { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 1rem; margin-top: 0.75rem; }
-    .cdet h4 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: 1rem; margin-bottom: 0.75rem; }
-    .crow { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 0.8rem; }
+    .dp { background: var(--amb); } .dc { background: var(--sage); }
+    .cdet { background: var(--surf); border: 1px solid var(--bord); border-radius: var(--r); padding: 1rem; margin-top: .75rem; }
+    .cdet h4 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: 1rem; margin-bottom: .75rem; }
+    .crow { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--bord); font-size: .8rem; }
     .crow:last-child { border: none; }
 
     /* TURNOS */
     .tlist { display: flex; flex-direction: column; gap: 10px; }
-    .tc { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 1rem 1.125rem; display: flex; gap: 12px; align-items: flex-start; }
-    .tc:hover { box-shadow: 0 2px 14px rgba(0,0,0,0.06); }
-    .av { width: 38px; height: 38px; border-radius: 50%; background: var(--sage-light); color: var(--sage-deep); font-weight: 500; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .tc { background: var(--surf); border: 1px solid var(--bord); border-radius: var(--r); padding: 1rem 1.125rem; display: flex; gap: 12px; align-items: flex-start; transition: box-shadow .12s; }
+    .tc:hover { box-shadow: 0 2px 14px rgba(0,0,0,.06); }
+    .av { width: 38px; height: 38px; border-radius: 50%; background: var(--sl); color: var(--g1); font-weight: 500; font-size: .8rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .tb { flex: 1; min-width: 0; }
     .tt { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 3px; flex-wrap: wrap; }
-    .tn { font-weight: 500; font-size: 0.875rem; }
-    .tm { font-size: 0.775rem; color: var(--text2); display: flex; gap: 10px; flex-wrap: wrap; margin-top: 2px; }
-    .tnota { font-size: 0.775rem; color: var(--text3); font-style: italic; margin-top: 3px; }
+    .tn { font-weight: 500; font-size: .875rem; }
+    .tm { font-size: .775rem; color: var(--t2); display: flex; gap: 10px; flex-wrap: wrap; margin-top: 2px; }
+    .tnota { font-size: .775rem; color: var(--t3); font-style: italic; margin-top: 3px; }
     .tact { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
-    .badge { font-size: 0.7rem; padding: 3px 9px; border-radius: 20px; font-weight: 500; white-space: nowrap; }
-    .bp { background: var(--amber-l); color: #7a5e1a; }
-    .bpa { background: var(--blue-l); color: var(--blue-t); }
-    .bc { background: var(--sage-light); color: var(--sage-deep); }
-    .bx { background: var(--rose-light); color: var(--rose); }
-    .bsm { padding: 5px 12px; border: 1px solid var(--border2); border-radius: 20px; font-size: 0.75rem; font-family: 'DM Sans', sans-serif; cursor: pointer; background: var(--surface); color: var(--text); -webkit-tap-highlight-color: transparent; transition: all 0.12s; }
-    .b-ok { border-color: var(--sage); color: var(--sage-deep); }  .b-ok:hover { background: var(--sage-light); }
-    .b-no { border-color: var(--rose); color: var(--rose); }       .b-no:hover { background: var(--rose-light); }
-    .b-w  { border-color: #25d366; color: #128c3e; }               .b-w:hover  { background: #e9faf0; }
-    .b-v  { border-color: var(--border2); color: var(--text2); }   .b-v:hover  { background: var(--warm); }
+    .badge { font-size: .7rem; padding: 3px 9px; border-radius: 20px; font-weight: 500; white-space: nowrap; }
+    .bp { background: var(--al); color: #7a5e1a; }
+    .bpa { background: var(--bl); color: var(--bt); }
+    .bc { background: var(--sl); color: var(--g1); }
+    .bx { background: var(--rl); color: var(--rose); }
+    .bsm { padding: 5px 12px; border: 1px solid var(--bord2); border-radius: 20px; font-size: .75rem; font-family: 'DM Sans', sans-serif; cursor: pointer; background: var(--surf); color: var(--t1); transition: all .12s; -webkit-tap-highlight-color: transparent; }
+    .b-ok { border-color: var(--sage); color: var(--g1); } .b-ok:hover { background: var(--sl); }
+    .b-no { border-color: var(--rose); color: var(--rose); } .b-no:hover { background: var(--rl); }
+    .b-w  { border-color: #25d366; color: #128c3e; }        .b-w:hover  { background: #e9faf0; }
+    .b-v  { border-color: var(--bord2); color: var(--t2); } .b-v:hover  { background: var(--warm); }
 
     /* PILLS */
     .pills { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 1rem; }
-    .pill { padding: 5px 13px; border: 1px solid var(--border2); border-radius: 20px; background: var(--surface); font-size: 0.75rem; font-family: 'DM Sans', sans-serif; cursor: pointer; color: var(--text2); transition: all 0.12s; -webkit-tap-highlight-color: transparent; }
-    .pill.on { background: var(--sage-light); border-color: var(--sage); color: var(--sage-deep); font-weight: 500; }
+    .pill { padding: 5px 13px; border: 1px solid var(--bord2); border-radius: 20px; background: var(--surf); font-size: .75rem; font-family: 'DM Sans', sans-serif; cursor: pointer; color: var(--t2); transition: all .12s; -webkit-tap-highlight-color: transparent; }
+    .pill.on { background: var(--sl); border-color: var(--sage); color: var(--g1); font-weight: 500; }
 
     /* MENSAJES */
-    .msgs-lay { display: grid; grid-template-columns: 210px 1fr; gap: 12px; }
-    .msgs-sb { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow-y: auto; max-height: calc(100vh - 160px); }
-    .msgs-chat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); display: flex; flex-direction: column; height: calc(100vh - 160px); }
-    .pat { padding: 11px 12px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.12s; display: flex; align-items: center; gap: 8px; -webkit-tap-highlight-color: transparent; }
+    .msgs-lay { display: grid; grid-template-columns: 220px 1fr; gap: 12px; height: calc(100vh - 160px); min-height: 400px; }
+    .msgs-sb { background: var(--surf); border: 1px solid var(--bord); border-radius: var(--r); overflow-y: auto; }
+    .msgs-chat-wrap { background: var(--surf); border: 1px solid var(--bord); border-radius: var(--r); display: flex; flex-direction: column; }
+    .pat {
+      padding: 11px 12px; border-bottom: 1px solid var(--bord); cursor: pointer;
+      transition: background .12s; display: flex; align-items: center; gap: 8px;
+      -webkit-tap-highlight-color: transparent;
+    }
     .pat:hover { background: var(--warm); }
-    .pat.on { background: var(--sage-light); }
-    .pnm { font-size: 0.82rem; font-weight: 500; }
-    .pprev { font-size: 0.72rem; color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
-    .unread { background: var(--rose); color: #fff; font-size: 0.62rem; padding: 2px 5px; border-radius: 8px; margin-left: auto; flex-shrink: 0; }
-    .chat-h { padding: 11px 14px; border-bottom: 1px solid var(--border); font-weight: 500; font-size: 0.875rem; }
-    .chat-msgs { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 8px; }
-    .msg { max-width: 76%; padding: 8px 13px; border-radius: 14px; font-size: 0.85rem; line-height: 1.5; word-break: break-word; }
-    .msg-me  { background: var(--sage-light); align-self: flex-end; border-bottom-right-radius: 3px; }
+    .pat.on { background: var(--sl); }
+    .pnm { font-size: .82rem; font-weight: 500; }
+    .pprev { font-size: .72rem; color: var(--t3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+    .unread { background: var(--rose); color: #fff; font-size: .62rem; padding: 2px 6px; border-radius: 8px; margin-left: auto; flex-shrink: 0; }
+    .chat-h {
+      padding: 10px 14px; border-bottom: 1px solid var(--bord);
+      display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-shrink: 0;
+    }
+    .chat-h span { font-weight: 500; font-size: .875rem; }
+    .btn-del-chat {
+      padding: 4px 10px; border: 1px solid var(--bord2); border-radius: 20px;
+      background: none; font-size: .72rem; cursor: pointer; color: var(--t3);
+      font-family: 'DM Sans', sans-serif; transition: all .12s; white-space: nowrap;
+    }
+    .btn-del-chat:hover { border-color: var(--rose); color: var(--rose); background: var(--rl); }
+    .chat-msgs-wrap { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 8px; }
+    .msg { max-width: 76%; padding: 8px 13px; border-radius: 14px; font-size: .85rem; line-height: 1.5; word-break: break-word; }
+    .msg-me  { background: var(--sl); align-self: flex-end; border-bottom-right-radius: 3px; }
     .msg-oth { background: var(--warm2); align-self: flex-start; border-bottom-left-radius: 3px; }
-    .msg-t { font-size: 0.65rem; color: var(--text3); margin-top: 2px; }
-    .chat-in { border-top: 1px solid var(--border); padding: 9px; display: flex; gap: 6px; align-items: flex-end; flex-shrink: 0; }
-    .cinp { flex: 1; border: 1px solid var(--border2); border-radius: 20px; padding: 8px 13px; font-size: 0.875rem; font-family: 'DM Sans', sans-serif; resize: none; outline: none; transition: border-color 0.15s; }
-    .cinp:focus { border-color: var(--sage); }
-    .csend { width: 34px; height: 34px; border-radius: 50%; background: var(--sage-deep); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; -webkit-tap-highlight-color: transparent; }
-    .msgs-empty { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text3); font-size: 0.85rem; text-align: center; padding: 1rem; }
+    .msg-t { font-size: .65rem; color: var(--t3); margin-top: 2px; }
+    .chat-in { border-top: 1px solid var(--bord); padding: 9px; display: flex; gap: 6px; align-items: flex-end; flex-shrink: 0; }
+    .cinp { flex: 1; border: 1px solid var(--bord2); border-radius: 20px; padding: 8px 13px; font-size: .875rem; font-family: 'DM Sans', sans-serif; resize: none; outline: none; transition: border-color .15s; -webkit-appearance: none; }
+    .cinp:focus { border-color: var(--g1); }
+    .csend { width: 34px; height: 34px; border-radius: 50%; background: var(--g1); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; -webkit-tap-highlight-color: transparent; }
+    .msgs-empty { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--t3); font-size: .85rem; text-align: center; padding: 1rem; }
 
     /* CONFIG */
     .cfg-grid { display: flex; flex-direction: column; gap: 12px; max-width: 580px; }
-    .cfg-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 1.25rem; }
-    .cfg-card h3 { font-size: 0.9rem; font-weight: 500; margin-bottom: 0.875rem; }
-    .fg { margin-bottom: 0.875rem; }
-    .fg label { display: block; font-size: 0.72rem; color: var(--text2); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; }
-    .fg input { width: 100%; padding: 10px 12px; border: 1px solid var(--border2); border-radius: var(--rs); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; outline: none; transition: border-color 0.15s; -webkit-appearance: none; }
-    .fg input:focus { border-color: var(--sage); }
-    .hchecks { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-    .hchk { display: flex; align-items: center; gap: 5px; font-size: 0.78rem; cursor: pointer; }
-    .hchk input { accent-color: var(--sage-deep); }
-    .btn-main { padding: 11px 20px; background: var(--sage-deep); color: #fff; border: none; border-radius: var(--rs); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-    .btn-main:hover { background: #3d6655; }
-    .cfg-ok { color: var(--sage-deep); font-size: 0.85rem; font-weight: 500; margin-top: 8px; display: none; }
+    .cfg-card { background: var(--surf); border: 1px solid var(--bord); border-radius: var(--r); padding: 1.25rem; }
+    .cfg-card h3 { font-size: .9rem; font-weight: 500; margin-bottom: .875rem; }
+    .hchecks { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; }
+    .hchk { display: flex; align-items: center; gap: 5px; font-size: .78rem; cursor: pointer; }
+    .hchk input { accent-color: var(--g1); }
+    .btn-main-cfg { padding: 11px 20px; background: var(--g1); color: #fff; border: none; border-radius: var(--rs); font-family: 'DM Sans', sans-serif; font-size: .9rem; font-weight: 500; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .btn-main-cfg:hover { background: var(--g2); }
+    .cfg-ok { color: var(--g1); font-size: .85rem; font-weight: 500; margin-top: 8px; display: none; }
 
     /* MODAL */
-    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); align-items: center; justify-content: center; z-index: 100; padding: 1rem; }
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.3); align-items: center; justify-content: center; z-index: 100; padding: 1rem; }
     .modal.open { display: flex; }
-    .mbox { background: var(--surface); border-radius: 16px; padding: 1.5rem; max-width: 440px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
-    .mclose { position: absolute; top: 12px; right: 14px; border: none; background: none; cursor: pointer; font-size: 1rem; color: var(--text3); padding: 4px; -webkit-tap-highlight-color: transparent; }
-    .mimg { width: 100%; max-height: 260px; object-fit: contain; border-radius: var(--rs); margin-top: 10px; border: 1px solid var(--border); }
+    .mbox { background: var(--surf); border-radius: 16px; padding: 1.5rem; max-width: 440px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 8px 32px rgba(0,0,0,.12); }
+    .mclose { position: absolute; top: 12px; right: 14px; border: none; background: none; cursor: pointer; font-size: 1rem; color: var(--t3); padding: 4px; }
+    .mimg { width: 100%; max-height: 260px; object-fit: contain; border-radius: var(--rs); margin-top: 10px; border: 1px solid var(--bord); }
     .mact { display: flex; gap: 8px; margin-top: 1rem; flex-wrap: wrap; }
-    .wsp-prev { background: #e9faf0; border: 1px solid #b2e4c6; border-radius: var(--rs); padding: 11px; font-size: 0.8rem; color: #1a5e3a; white-space: pre-line; line-height: 1.6; margin: 10px 0; }
+    .wsp-prev { background: #e9faf0; border: 1px solid #b2e4c6; border-radius: var(--rs); padding: 11px; font-size: .8rem; color: #1a5e3a; white-space: pre-line; line-height: 1.6; margin: 10px 0; }
 
-    /* LOGIN */
-    .login-wrap { display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 54px); padding: 1.5rem; background: var(--warm); }
-    .lcard { background: var(--surface); border-radius: 18px; padding: 2rem 1.75rem; max-width: 360px; width: 100%; box-shadow: 0 4px 24px rgba(0,0,0,0.08); border: 1px solid var(--border); }
-    .logo-c { width: 50px; height: 50px; border-radius: 50%; background: var(--sage-light); color: var(--sage-deep); font-family: 'DM Serif Display', serif; font-size: 1.4rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; }
-    .lcard h2 { text-align: center; font-family: 'DM Serif Display', serif; font-size: 1.1rem; font-weight: 400; margin-bottom: 1.5rem; }
-    .err { font-size: 0.82rem; color: var(--rose); background: var(--rose-light); padding: 9px 12px; border-radius: var(--rs); margin-bottom: 10px; display: none; }
-    .btn-full { width: 100%; padding: 12px; background: var(--sage-deep); color: #fff; border: none; border-radius: var(--rs); font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 500; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-    .btn-full:hover { background: #3d6655; }
+    /* EMPTY / LOADING */
+    .empty { text-align: center; padding: 2.5rem 1rem; color: var(--t3); font-size: .875rem; }
 
-    /* LOADING */
-    .ovl { display: none; position: fixed; inset: 0; background: rgba(247,245,240,0.9); align-items: center; justify-content: center; z-index: 999; flex-direction: column; gap: 12px; }
-    .ovl.on { display: flex; }
-    .spin { width: 26px; height: 26px; border: 2px solid var(--sage-mid); border-top-color: var(--sage-deep); border-radius: 50%; animation: spin 0.7s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .ovl p { font-size: 0.875rem; color: var(--text2); }
-    .empty { text-align: center; padding: 2.5rem 1rem; color: var(--text3); font-size: 0.85rem; }
-
-    /* RESPONSIVE */
+    /* ── RESPONSIVE ── */
     @media (max-width: 680px) {
       .sidebar { display: none; }
       .botnav { display: block; }
-      .main { padding: 1rem 0.875rem; padding-bottom: 72px; }
-      .msgs-lay { grid-template-columns: 1fr; }
-      .msgs-sb { max-height: 180px; }
-      .msgs-chat { height: 340px; }
-      .hchecks { grid-template-columns: repeat(3, 1fr); }
+      .main { padding: 1rem .875rem; padding-bottom: 72px; }
+      .msgs-lay { grid-template-columns: 1fr; height: auto; }
+      .msgs-sb { max-height: 170px; }
+      .msgs-chat-wrap { height: 360px; }
+      .hchecks { grid-template-columns: repeat(3,1fr); }
       .cgrid { gap: 2px; }
-      .cday { min-height: 42px; padding: 4px; }
-      .login-wrap { padding: 0; align-items: flex-start; background: var(--surface); }
-      .lcard { border-radius: 0; box-shadow: none; border: none; max-width: 100%; padding: 2rem 1.25rem; min-height: calc(100vh - 54px); }
-      .fg input { padding: 13px; font-size: 1rem; }
-      .btn-full { padding: 14px; font-size: 1rem; }
-      .tc { padding: 0.875rem; }
-      .tact { gap: 5px; }
-      .bsm { padding: 6px 10px; font-size: 0.72rem; }
+      .cday { min-height: 44px; padding: 4px; }
+      .cdn { font-size: .7rem; }
       .pills { gap: 4px; }
-      .pill { padding: 5px 10px; font-size: 0.72rem; }
+      .pill { padding: 5px 10px; font-size: .72rem; }
+      .tact { gap: 5px; }
+      .bsm { padding: 6px 10px; font-size: .72rem; }
+      /* Login mobile - full screen sin card */
+      .login-page { background: var(--surf); }
+      .login-inner { padding: 0; align-items: flex-start; min-height: 100vh; }
+      .login-card { border-radius: 0; box-shadow: none; border: none; max-width: 100%; padding: 0; min-height: 100vh; display: flex; flex-direction: column; }
+      .login-mob-top {
+        background: linear-gradient(155deg, var(--g1) 0%, var(--g2) 100%);
+        padding: 2.5rem 1.5rem 4rem; position: relative; overflow: hidden; flex-shrink: 0;
+      }
+      .login-mob-top::before {
+        content: ''; position: absolute; width: 280px; height: 280px;
+        background: radial-gradient(circle, rgba(194,217,207,.2) 0%, transparent 65%);
+        top: -60px; right: -50px; pointer-events: none;
+      }
+      .login-mob-top::after {
+        content: ''; position: absolute; bottom: -2px; left: -5%; right: -5%; height: 50px;
+        background: var(--surf); border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+      }
+      .lmb-brand { display: flex; align-items: center; gap: 7px; margin-bottom: 1rem; position: relative; z-index: 1; }
+      .lmb-brand .d { width: 7px; height: 7px; background: rgba(255,255,255,.6); border-radius: 50%; }
+      .lmb-brand span { color: rgba(255,255,255,.75); font-size: .825rem; font-weight: 500; }
+      .lmb-title { font-family: 'DM Serif Display', serif; font-size: 1.75rem; font-weight: 400; color: #fff; line-height: 1.15; position: relative; z-index: 1; }
+      .lmb-title em { font-style: italic; color: var(--sm); }
+      .lmb-sub { color: rgba(255,255,255,.6); font-size: .8rem; margin-top: .4rem; position: relative; z-index: 1; }
+      .login-form-inner { padding: 1.75rem 1.5rem; flex: 1; }
+      .login-logo { display: none !important; }
+      .login-card h2 { text-align: left; font-size: 1.1rem; }
+      .fg input { padding: 13px 14px; font-size: 1rem; }
+      .btn-p { padding: 14px; font-size: 1rem; }
+    }
+    @media (min-width: 681px) {
+      .login-mob-top { display: none; }
+      .login-form-inner { padding: 0; }
     }
   </style>
 </head>
 <body>
 
-<div class="ovl" id="ov"><div class="spin"></div><p id="ovTxt">Verificando...</p></div>
-
-<nav class="topnav">
-  <div class="brand"><span class="brand-dot"></span><span class="brand-name">Panel psicóloga</span></div>
+<nav class="nav">
+  <div class="nav-brand"><span class="nav-dot"></span><span class="nav-name">Panel psicóloga</span></div>
   <div id="navR"></div>
 </nav>
 
 <!-- LOGIN -->
-<div id="loginSec" class="login-wrap" style="display:none">
-  <div class="lcard">
-    <div class="logo-c">G</div>
-    <h2>Acceso psicóloga</h2>
-    <div class="err" id="loginErr"></div>
-    <div class="fg"><label>Email</label><input type="email" id="lEmail" placeholder="Tu email" autocomplete="email" inputmode="email"></div>
-    <div class="fg"><label>Contraseña</label><input type="password" id="lPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
-    <button class="btn-full" onclick="doLogin()">Ingresar</button>
-    <p style="text-align:center;font-size:0.775rem;color:var(--text3);margin-top:1rem"><a href="index.html" style="color:var(--sage-deep);text-decoration:none">← Volver al inicio</a></p>
+<div id="loginSec" class="login-page">
+  <div class="login-inner">
+    <div class="login-card">
+      <!-- Cabecera mobile verde -->
+      <div class="login-mob-top">
+        <div class="lmb-brand"><span class="d"></span><span>Consultorio</span></div>
+        <div class="lmb-title">Panel<br><em>psicóloga.</em></div>
+        <div class="lmb-sub">Acceso exclusivo para Graciela.</div>
+      </div>
+
+      <div class="login-form-inner">
+        <div class="login-logo">G</div>
+        <h2>Acceso psicóloga</h2>
+        <div class="lerr" id="loginErr"></div>
+        <div class="fg"><label>Email</label><input type="email" id="lEmail" placeholder="tu@email.com" autocomplete="email" inputmode="email"></div>
+        <div class="fg" style="margin-bottom:1.25rem"><label>Contraseña</label><input type="password" id="lPass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <button class="btn-p" onclick="doLogin()">Ingresar</button>
+        <p class="login-back"><a href="index.html">← Volver al inicio</a></p>
+      </div>
+    </div>
   </div>
 </div>
 
 <!-- PANEL -->
-<div id="panelSec" style="display:none">
+<div id="panelSec">
   <div class="layout">
     <aside class="sidebar">
       <button class="sb on" id="sb-c" onclick="showSec('c')">📅 Calendario</button>
@@ -215,16 +332,23 @@
       <button class="sb"    id="sb-m" onclick="showSec('m')">💬 Mensajes <span class="rdot" id="rdotM"></span></button>
       <button class="sb"    id="sb-g" onclick="showSec('g')">⚙️ Config</button>
     </aside>
+
     <div class="main">
 
       <!-- CALENDARIO -->
       <div class="sec on" id="sec-c">
         <div class="sh">
           <h2 id="calTitle">Cargando...</h2>
-          <div class="cal-nav-wrap"><button class="cnav" onclick="chgMes(-1)">←</button><button class="cnav" onclick="chgMes(1)">→</button></div>
+          <div class="cal-nav-wrap">
+            <button class="cnav" onclick="chgMes(-1)">←</button>
+            <button class="cnav" onclick="chgMes(1)">→</button>
+          </div>
         </div>
         <div class="cgrid" id="cgrid"></div>
-        <div class="cdet" id="cdet" style="display:none"><h4 id="cdetTitle"></h4><div id="cdetBody"></div></div>
+        <div class="cdet" id="cdet" style="display:none">
+          <h4 id="cdetTitle"></h4>
+          <div id="cdetBody"></div>
+        </div>
       </div>
 
       <!-- SOLICITUDES -->
@@ -245,7 +369,7 @@
         <div class="sh"><h2>Mensajes</h2></div>
         <div class="msgs-lay">
           <div class="msgs-sb" id="msgsSB"><div class="msgs-empty">Sin conversaciones</div></div>
-          <div class="msgs-chat" id="msgsChat"><div class="msgs-empty">Seleccioná un paciente</div></div>
+          <div class="msgs-chat-wrap" id="msgsChat"><div class="msgs-empty">Seleccioná un paciente</div></div>
         </div>
       </div>
 
@@ -265,11 +389,11 @@
           </div>
           <div class="cfg-card">
             <h3>Horarios disponibles</h3>
-            <p style="font-size:0.8rem;color:var(--text2);margin-bottom:10px">Marcá los que ofrecés</p>
+            <p style="font-size:.8rem;color:var(--t2);margin-bottom:10px">Marcá los que ofrecés</p>
             <div class="hchecks" id="hchecks"></div>
           </div>
         </div>
-        <button class="btn-main" style="margin-top:1rem" onclick="saveCfg()">Guardar cambios</button>
+        <button class="btn-main-cfg" style="margin-top:1rem" onclick="saveCfg()">Guardar cambios</button>
         <div class="cfg-ok" id="cfgOk">✓ Guardado</div>
       </div>
 
@@ -278,7 +402,7 @@
 </div>
 
 <!-- BOTTOM NAV -->
-<nav class="botnav">
+<nav class="botnav" id="botnavEl" style="display:none">
   <div class="botnav-inner">
     <button class="bnb on" id="bn-c" onclick="showSec('c')"><span class="bnb-ico">📅</span><span>Agenda</span></button>
     <button class="bnb"    id="bn-s" onclick="showSec('s')"><span class="bnb-ico">✅</span><span>Turnos</span><span class="bndot" id="bndotS"></span></button>
@@ -298,55 +422,63 @@ const SURL  = 'https://dzvfjedtjhlvwipnxzmi.supabase.co';
 const SKEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6dmZqZWR0amhsdndpcG54em1pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5NDc2NTMsImV4cCI6MjA5NDUyMzY1M30.5JcK7Ll67WIFoTY6Z00qiOEEbzh8nC3y1lmiBkuo8zU';
 const ADMIN = 'gracielacolli@hotmail.com';
 const sb = supabase.createClient(SURL, SKEY);
-const $ = id => document.getElementById(id);
-const HORAS = ['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00'];
+const $  = id => document.getElementById(id);
+
+const HORAS  = ['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00'];
 const LABELS = { pendiente_pago:'Sin pago', pago_enviado:'Comprobante enviado', confirmado:'Confirmado', cancelado:'Cancelado' };
 const BCLS   = { pendiente_pago:'bp', pago_enviado:'bpa', confirmado:'bc', cancelado:'bx' };
 
-let turnos = [], filtro = 'pago_enviado', calY, calM, selPat = null;
+let turnos=[], filtro='pago_enviado', calY, calM, selPat=null, selNom='';
+// Chats borrados por la psicóloga (se guarda en localStorage)
+let hiddenChats = JSON.parse(localStorage.getItem('hiddenChats')||'[]');
 
-function ov(t) { $('ovTxt').textContent=t; $('ov').classList.add('on'); }
-function offOv() { $('ov').classList.remove('on'); }
 function openM(h) { $('mContent').innerHTML=h; $('modal').classList.add('open'); }
 function closeM() { $('modal').classList.remove('open'); }
 function fmtF(f) { if(!f)return''; const[y,m,d]=f.split('-'); const M=['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']; return `${parseInt(d)} ${M[parseInt(m)]} ${y}`; }
 function fmtT(ts) { return ts?new Date(ts).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}):''; }
 function esc(t) { return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function ini(n) { return (n||'?').split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase(); }
+function showE(id,m) { const e=$(id); e.textContent=m; e.style.display='block'; }
 
-// ── INIT ──────────────────────────────────────────────────────
-ov('Verificando acceso...');
+// ── INIT — sin flash, body invisible hasta saber si hay sesión ──
 sb.auth.getSession().then(({ data }) => {
   if (data.session && data.session.user.email === ADMIN) {
     showPanel();
   } else if (data.session) {
-    offOv(); window.location.replace('index.html');
+    window.location.replace('index.html');
   } else {
-    offOv(); $('loginSec').style.display = 'flex';
+    $('loginSec').style.display = 'block';
+    document.body.classList.add('ready');
   }
-}).catch(() => { offOv(); $('loginSec').style.display = 'flex'; });
+}).catch(() => {
+  $('loginSec').style.display = 'block';
+  document.body.classList.add('ready');
+});
 
 function showPanel() {
-  $('loginSec').style.display = 'none'; $('panelSec').style.display = 'block';
+  $('loginSec').style.display = 'none';
+  $('panelSec').style.display = 'block';
+  $('botnavEl').style.display = 'block';
   $('navR').innerHTML = `<button class="nav-out" onclick="doLogout()">Salir</button>`;
-  const n = new Date(); calY = n.getFullYear(); calM = n.getMonth();
-  offOv(); buildHChecks(); loadCfg(); loadAll(); subRT();
+  const n = new Date(); calY=n.getFullYear(); calM=n.getMonth();
+  document.body.classList.add('ready');
+  buildHChecks(); loadCfg(); loadAll(); subRT();
 }
 
 async function doLogin() {
-  const email = $('lEmail').value.trim(), pass = $('lPass').value;
-  $('loginErr').style.display = 'none';
+  const email=$('lEmail').value.trim(), pass=$('lPass').value;
+  $('loginErr').style.display='none';
   if (!email||!pass) { showE('loginErr','Completá email y contraseña.'); return; }
   if (email !== ADMIN) { showE('loginErr','Este acceso es solo para la psicóloga.'); return; }
-  ov('Ingresando...');
-  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
-  if (error) { offOv(); showE('loginErr','Contraseña incorrecta.'); return; }
+  const btn = document.querySelector('#loginSec .btn-p');
+  btn.disabled=true; btn.textContent='Ingresando...';
+  const { data, error } = await sb.auth.signInWithPassword({ email, password:pass });
+  if (error) { btn.disabled=false; btn.textContent='Ingresar'; showE('loginErr','Contraseña incorrecta.'); return; }
   showPanel();
 }
-function showE(id,m) { const e=$(id); e.textContent=m; e.style.display='block'; }
 async function doLogout() { await sb.auth.signOut(); window.location.replace('index.html'); }
 
-// ── SECCIONES ─────────────────────────────────────────────────
+// ── SECCIONES ──
 function showSec(id) {
   ['c','s','m','g'].forEach(x => {
     $('sec-'+x).classList.toggle('on', x===id);
@@ -357,29 +489,27 @@ function showSec(id) {
   if (id==='m') loadMsgs();
 }
 
-// ── DATOS ─────────────────────────────────────────────────────
+// ── DATOS ──
 async function loadAll() {
   const { data } = await sb.from('turnos').select('*').order('fecha').order('hora');
-  turnos = data || [];
+  turnos = data||[];
   renderSol(); renderCal(); updateDots();
 }
 
 function updateDots() {
   const p = turnos.filter(t=>['pago_enviado','pendiente_pago'].includes(t.estado)).length;
-  ['rdotS','bndotS'].forEach(id => { const el=$(id); el.classList.toggle('show', p>0); });
+  ['rdotS','bndotS'].forEach(id=>{ const el=$(id); if(el)el.classList.toggle('show',p>0); });
 }
 
-// ── SOLICITUDES ───────────────────────────────────────────────
-function setF(f, btn) {
-  filtro=f; document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on')); btn.classList.add('on'); renderSol();
-}
+// ── SOLICITUDES ──
+function setF(f,btn) { filtro=f; document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on')); btn.classList.add('on'); renderSol(); }
 
 function renderSol() {
   const lista = filtro==='todos' ? turnos : turnos.filter(t=>t.estado===filtro);
-  const el = $('tlist');
+  const el=$('tlist');
   if (!lista.length) { el.innerHTML='<div class="empty">No hay turnos en esta categoría.</div>'; return; }
-  el.innerHTML = lista.map(t => {
-    const cls = BCLS[t.estado]||'';
+  el.innerHTML = lista.map(t=>{
+    const cls=BCLS[t.estado]||'';
     return `<div class="tc">
       <div class="av">${ini(t.paciente_nombre)}</div>
       <div class="tb">
@@ -401,188 +531,229 @@ async function confirmar(id) { await sb.from('turnos').update({estado:'confirmad
 async function cancelar(id) { if(!confirm('¿Cancelar este turno?'))return; await sb.from('turnos').update({estado:'cancelado'}).eq('id',id); loadAll(); }
 
 function verComp(id) {
-  const t = turnos.find(x=>x.id===id); if(!t) return;
+  const t=turnos.find(x=>x.id===id); if(!t)return;
   openM(`<h3 style="font-family:'DM Serif Display',serif;font-weight:400;margin-bottom:6px">Comprobante de pago</h3>
-    <p style="font-size:.8rem;color:var(--text2)">${esc(t.paciente_nombre)} · ${fmtF(t.fecha)} ${t.hora}</p>
-    ${t.comprobante_url?`<img src="${t.comprobante_url}" class="mimg" alt="Comprobante">`:'<p style="margin-top:12px;color:var(--text3)">Sin imagen adjunta.</p>'}
+    <p style="font-size:.8rem;color:var(--t2)">${esc(t.paciente_nombre)} · ${fmtF(t.fecha)} ${t.hora}</p>
+    ${t.comprobante_url?`<img src="${t.comprobante_url}" class="mimg" alt="Comprobante">`:'<p style="margin-top:12px;color:var(--t3)">Sin imagen adjunta.</p>'}
     <div class="mact">
-      ${['pago_enviado','pendiente_pago'].includes(t.estado)?`<button class="btn-main" onclick="confirmar('${t.id}');closeM()">✓ Confirmar</button>`:''}
+      ${['pago_enviado','pendiente_pago'].includes(t.estado)?`<button class="btn-main-cfg" onclick="confirmar('${t.id}');closeM()">✓ Confirmar</button>`:''}
       <button class="bsm b-no" onclick="cancelar('${t.id}');closeM()">✕ Cancelar</button>
     </div>`);
 }
 
 async function prepWsp(id) {
-  const t = turnos.find(x=>x.id===id); if(!t) return;
-  const { data: cfg } = await sb.from('config').select('wsp_psicologa').single();
-  const telPsi = cfg?.wsp_psicologa||'';
-  const mP = `Hola ${(t.paciente_nombre||'').split(' ')[0]} 👋\n\nTu turno está *confirmado* ✅\n📅 Fecha: ${fmtF(t.fecha)}\n🕐 Hora: ${t.hora} hs\n\nCualquier cambio avisame con anticipación. ¡Te espero! 😊`;
-  const mG = `📋 Turno confirmado\n👤 ${t.paciente_nombre}\n📅 ${fmtF(t.fecha)}\n🕐 ${t.hora} hs\n📱 ${t.paciente_tel||'—'}`;
+  const t=turnos.find(x=>x.id===id); if(!t)return;
+  const { data:cfg } = await sb.from('config').select('wsp_psicologa').single();
+  const telPsi=cfg?.wsp_psicologa||'';
+  const mP=`Hola ${(t.paciente_nombre||'').split(' ')[0]} 👋\n\nTu turno está *confirmado* ✅\n📅 Fecha: ${fmtF(t.fecha)}\n🕐 Hora: ${t.hora} hs\n\nCualquier cambio avisame con anticipación. ¡Te espero! 😊`;
+  const mG=`📋 Turno confirmado\n👤 ${t.paciente_nombre}\n📅 ${fmtF(t.fecha)}\n🕐 ${t.hora} hs\n📱 ${t.paciente_tel||'—'}`;
   openM(`<h3 style="font-family:'DM Serif Display',serif;font-weight:400;margin-bottom:6px">📲 Avisos por WhatsApp</h3>
-    <p style="font-size:.8rem;color:var(--text2);margin-bottom:8px">Mensaje al paciente:</p>
+    <p style="font-size:.8rem;color:var(--t2);margin-bottom:8px">Mensaje que recibirá el paciente:</p>
     <div class="wsp-prev">${esc(mP)}</div>
-    <div class="mact" style="flex-wrap:wrap">
-      <button class="bsm b-w" onclick="abrirWsp('${(t.paciente_tel||'').replace(/\D/g,'')}','${encodeURIComponent(mP)}')">📲 Enviar al paciente</button>
-      ${telPsi?`<button class="bsm b-w" onclick="abrirWsp('${telPsi.replace(/\D/g,'')}','${encodeURIComponent(mG)}')">📲 Avisarme a mí</button>`:''}
+    <div class="mact">
+      <button class="bsm b-w" onclick="window.open('https://wa.me/${(t.paciente_tel||'').replace(/\D/g,'')}?text=${encodeURIComponent(mP)}','_blank')">📲 Enviar al paciente</button>
+      ${telPsi?`<button class="bsm b-w" onclick="window.open('https://wa.me/${telPsi.replace(/\D/g,'')}?text=${encodeURIComponent(mG)}','_blank')">📲 Avisarme a mí</button>`:''}
       <button class="bsm" onclick="closeM()">Cerrar</button>
     </div>`);
 }
-function abrirWsp(tel, msgEnc) { window.open(`https://wa.me/${tel}?text=${msgEnc}`,'_blank'); }
 
-// ── CALENDARIO ────────────────────────────────────────────────
+// ── CALENDARIO ──
 function chgMes(d) { calM+=d; if(calM>11){calM=0;calY++;}if(calM<0){calM=11;calY--;} renderCal(); $('cdet').style.display='none'; }
 
 function renderCal() {
-  const M = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  $('calTitle').textContent = `${M[calM]} ${calY}`;
-  const dias = ['D','L','M','X','J','V','S'], hoy = new Date();
-  let html = dias.map(d=>`<div class="cdow">${d}</div>`).join('');
-  const primer = new Date(calY,calM,1), ultimo = new Date(calY,calM+1,0);
+  if (!$('calTitle')) return;
+  const M=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  $('calTitle').textContent=`${M[calM]} ${calY}`;
+  const dias=['D','L','M','X','J','V','S'], hoy=new Date();
+  let html=dias.map(d=>`<div class="cdow">${d}</div>`).join('');
+  const primer=new Date(calY,calM,1), ultimo=new Date(calY,calM+1,0);
   for(let i=0;i<primer.getDay();i++) html+=`<div class="cday om"></div>`;
-  for(let d=1;d<=ultimo.getDate();d++) {
+  for(let d=1;d<=ultimo.getDate();d++){
     const f=`${calY}-${String(calM+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const td = turnos.filter(t=>t.fecha===f&&t.estado!=='cancelado');
-    const isHoy = hoy.getFullYear()===calY&&hoy.getMonth()===calM&&hoy.getDate()===d;
-    const hasPend = td.some(t=>['pendiente_pago','pago_enviado'].includes(t.estado));
-    const hasConf = td.some(t=>t.estado==='confirmado');
-    const cls = ['cday',isHoy?'hoy':'',td.length?'has':''].filter(Boolean).join(' ');
-    const dots = [hasPend?'<span class="cdot dp"></span>':'',hasConf?'<span class="cdot dc"></span>':''].join('');
+    const td=turnos.filter(t=>t.fecha===f&&t.estado!=='cancelado');
+    const isHoy=hoy.getFullYear()===calY&&hoy.getMonth()===calM&&hoy.getDate()===d;
+    const hasPend=td.some(t=>['pendiente_pago','pago_enviado'].includes(t.estado));
+    const hasConf=td.some(t=>t.estado==='confirmado');
+    const cls=['cday',isHoy?'hoy':'',td.length?'has':''].filter(Boolean).join(' ');
+    const dots=[hasPend?'<span class="cdot dp"></span>':'',hasConf?'<span class="cdot dc"></span>':''].join('');
     html+=`<div class="${cls}" onclick="selDay('${f}',this)"><div class="cdn">${d}</div>${dots?`<div class="cdots">${dots}</div>`:''}</div>`;
   }
-  $('cgrid').innerHTML = html;
+  $('cgrid').innerHTML=html;
 }
 
-function selDay(f, el) {
+function selDay(f,el) {
   document.querySelectorAll('.cday').forEach(d=>d.classList.remove('sel')); el.classList.add('sel');
-  const td = turnos.filter(t=>t.fecha===f&&t.estado!=='cancelado').sort((a,b)=>a.hora.localeCompare(b.hora));
-  $('cdetTitle').textContent = fmtF(f);
-  $('cdetBody').innerHTML = td.length
-    ? td.map(t=>`<div class="crow"><span style="font-weight:500;min-width:42px">${t.hora}</span><span style="flex:1">${esc(t.paciente_nombre||'—')}</span><span class="badge ${BCLS[t.estado]||''}">${LABELS[t.estado]||t.estado}</span></div>`).join('')
-    : '<p style="color:var(--text3);font-size:.85rem">Sin turnos este día.</p>';
-  $('cdet').style.display = 'block';
+  const td=turnos.filter(t=>t.fecha===f&&t.estado!=='cancelado').sort((a,b)=>a.hora.localeCompare(b.hora));
+  $('cdetTitle').textContent=fmtF(f);
+  $('cdetBody').innerHTML=td.length
+    ?td.map(t=>`<div class="crow"><span style="font-weight:500;min-width:44px">${t.hora}</span><span style="flex:1">${esc(t.paciente_nombre||'—')}</span><span class="badge ${BCLS[t.estado]||''}">${LABELS[t.estado]||t.estado}</span></div>`).join('')
+    :'<p style="color:var(--t3);font-size:.85rem">Sin turnos este día.</p>';
+  $('cdet').style.display='block';
 }
 
-// ── MENSAJES ──────────────────────────────────────────────────
-let pollingInterval = null;
+// ── MENSAJES ──
+let msgPoll=null;
 
 async function loadMsgs() {
-  const { data: msgs, error } = await sb.from('mensajes')
+  const { data:msgs } = await sb.from('mensajes')
     .select('paciente_id,contenido,created_at,leido,remitente')
     .order('created_at',{ascending:false});
-
-  if (error) { console.error('Error cargando mensajes:', error); return; }
   if (!msgs?.length) { $('msgsSB').innerHTML='<div class="msgs-empty">Sin mensajes aún</div>'; return; }
 
-  const byP = {};
-  msgs.forEach(m => {
-    if (!byP[m.paciente_id]) byP[m.paciente_id] = { msgs:[], unread:0 };
+  // Agrupar por paciente — pero solo mostrar chats NO borrados,
+  // a menos que hayan recibido un mensaje nuevo después del borrado
+  const byP={};
+  msgs.forEach(m=>{
+    if(!byP[m.paciente_id]) byP[m.paciente_id]={msgs:[],unread:0,lastTs:m.created_at};
     byP[m.paciente_id].msgs.push(m);
-    if (!m.leido && m.remitente === 'paciente') byP[m.paciente_id].unread++;
+    if(!m.leido&&m.remitente==='paciente') byP[m.paciente_id].unread++;
   });
 
-  const ids = Object.keys(byP);
-  const { data: pacs } = await sb.from('pacientes').select('user_id,nombre').in('user_id', ids);
-  const nm = {}; (pacs||[]).forEach(p => nm[p.user_id] = p.nombre);
+  // Filtrar chats borrados — solo ocultarlos si no tienen mensajes nuevos desde el borrado
+  const hiddenMap=JSON.parse(localStorage.getItem('hiddenChats')||'{}');
+  const visibleIds=Object.keys(byP).filter(pid=>{
+    if (!hiddenMap[pid]) return true; // no borrado
+    const lastMsg=byP[pid].msgs[byP[pid].msgs.length-1]; // más nuevo (asc)
+    // Si hay mensajes del paciente DESPUÉS del borrado, volver a mostrar
+    const newMsgs=byP[pid].msgs.filter(m=>m.remitente==='paciente'&&m.created_at>hiddenMap[pid]);
+    return newMsgs.length>0;
+  });
 
-  $('msgsSB').innerHTML = ids.map(pid => {
-    const info = byP[pid], nom = nm[pid] || 'Paciente';
-    const esc_nom = nom.replace(/'/g, "\\'");
-    return `<div class="pat ${selPat===pid?'on':''}" onclick="selPat2('${pid}','${esc_nom}')">
+  const ids=visibleIds;
+  if (!ids.length) { $('msgsSB').innerHTML='<div class="msgs-empty">Sin conversaciones</div>'; return; }
+
+  const { data:pacs } = await sb.from('pacientes').select('user_id,nombre').in('user_id',ids);
+  const nm={}; (pacs||[]).forEach(p=>nm[p.user_id]=p.nombre);
+
+  $('msgsSB').innerHTML=ids.map(pid=>{
+    const info=byP[pid];
+    // Calcular fecha de borrado para mostrar solo mensajes posteriores si aplica
+    const hiddenTs=hiddenMap[pid];
+    const visibleMsgs=hiddenTs?info.msgs.filter(m=>m.created_at>hiddenTs):info.msgs;
+    const lastMsg=visibleMsgs[0]; // más reciente
+    const nom=nm[pid]||'Paciente';
+    const unread=hiddenTs?visibleMsgs.filter(m=>!m.leido&&m.remitente==='paciente').length:info.unread;
+    return `<div class="pat ${selPat===pid?'on':''}" onclick="selPat2('${pid}','${nom.replace(/'/g,"\\'")}')">
       <div class="av" style="width:30px;height:30px;font-size:.72rem;flex-shrink:0">${ini(nom)}</div>
-      <div style="min-width:0;flex:1"><div class="pnm">${esc(nom)}</div><div class="pprev">${esc(info.msgs[0]?.contenido||'')}</div></div>
-      ${info.unread ? `<span class="unread">${info.unread}</span>` : ''}
+      <div style="min-width:0;flex:1">
+        <div class="pnm">${esc(nom)}</div>
+        <div class="pprev">${esc(lastMsg?.contenido||'')}</div>
+      </div>
+      ${unread?`<span class="unread">${unread}</span>`:''}
     </div>`;
   }).join('');
 
-  const totalU = Object.values(byP).reduce((s,x) => s+x.unread, 0);
-  ['rdotM','bndotM'].forEach(id => { const el=$(id); if(el) el.classList.toggle('show', totalU>0); });
+  const totalU=ids.reduce((s,pid)=>{
+    const hiddenTs=hiddenMap[pid];
+    const info=byP[pid];
+    const vis=hiddenTs?info.msgs.filter(m=>m.created_at>hiddenTs):info.msgs;
+    return s+vis.filter(m=>!m.leido&&m.remitente==='paciente').length;
+  },0);
+  ['rdotM','bndotM'].forEach(id=>{ const el=$(id); if(el)el.classList.toggle('show',totalU>0); });
 }
 
-async function selPat2(pid, nom) {
-  selPat = pid;
-  // Marcar como leídos
+async function selPat2(pid,nom) {
+  selPat=pid; selNom=nom;
   await sb.from('mensajes').update({leido:true}).eq('paciente_id',pid).eq('remitente','paciente');
 
-  const { data: msgs, error } = await sb.from('mensajes')
+  const { data:allMsgs } = await sb.from('mensajes')
     .select('*').eq('paciente_id',pid).order('created_at',{ascending:true});
 
-  if (error) { console.error('Error cargando chat:', error); return; }
+  // Aplicar filtro de borrado
+  const hiddenMap=JSON.parse(localStorage.getItem('hiddenChats')||'{}');
+  const hiddenTs=hiddenMap[pid];
+  const msgs=hiddenTs?(allMsgs||[]).filter(m=>m.created_at>hiddenTs):(allMsgs||[]);
 
-  const esc_nom = nom.replace(/'/g, "\\'");
-  $('msgsChat').innerHTML = `
-    <div class="chat-h">${esc(nom)}</div>
-    <div class="chat-msgs" id="chatMsgsA">
-      ${(msgs||[]).map(m => {
-        const ip = m.remitente === 'psicologa';
+  const esc_nom=nom.replace(/'/g,"\\'");
+  $('msgsChat').innerHTML=`
+    <div class="chat-h">
+      <span>${esc(nom)}</span>
+      <button class="btn-del-chat" onclick="borrarChat('${pid}','${esc_nom}')">Limpiar chat</button>
+    </div>
+    <div class="chat-msgs-wrap" id="chatMsgsA">
+      ${msgs.map(m=>{
+        const ip=m.remitente==='psicologa';
         return `<div>
           <div class="msg ${ip?'msg-me':'msg-oth'}">${esc(m.contenido)}</div>
           <div class="msg-t" style="text-align:${ip?'right':'left'}">${fmtT(m.created_at)}</div>
         </div>`;
-      }).join('') || '<div class="msgs-empty">Sin mensajes todavía.</div>'}
+      }).join('')||'<div class="msgs-empty">Sin mensajes todavía.</div>'}
     </div>
     <div class="chat-in">
       <textarea class="cinp" id="adMsgIn" placeholder="Responder a ${esc(nom)}..." rows="1"
         onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAdMsg('${pid}','${esc_nom}')}"></textarea>
       <button class="csend" onclick="sendAdMsg('${pid}','${esc_nom}')">➤</button>
     </div>`;
+  const mc=$('chatMsgsA'); if(mc) mc.scrollTop=mc.scrollHeight;
 
-  const mc = $('chatMsgsA'); if (mc) mc.scrollTop = mc.scrollHeight;
-
-  // Iniciar polling de respaldo cada 4 segundos para este chat
-  if (pollingInterval) clearInterval(pollingInterval);
-  pollingInterval = setInterval(() => refreshChat(pid, nom), 4000);
-
+  if(msgPoll) clearInterval(msgPoll);
+  msgPoll=setInterval(()=>refreshChat(pid,nom),4000);
   loadMsgs();
 }
 
-// Actualiza solo los mensajes del chat abierto sin redibujar todo
-async function refreshChat(pid, nom) {
-  if (selPat !== pid) { clearInterval(pollingInterval); return; }
-  const { data: msgs } = await sb.from('mensajes')
-    .select('*').eq('paciente_id',pid).order('created_at',{ascending:true});
-  if (!msgs) return;
-  const mc = $('chatMsgsA'); if (!mc) return;
-  const wasAtBottom = mc.scrollHeight - mc.scrollTop - mc.clientHeight < 60;
-  mc.innerHTML = (msgs||[]).map(m => {
-    const ip = m.remitente === 'psicologa';
-    return `<div>
-      <div class="msg ${ip?'msg-me':'msg-oth'}">${esc(m.contenido)}</div>
-      <div class="msg-t" style="text-align:${ip?'right':'left'}">${fmtT(m.created_at)}</div>
-    </div>`;
-  }).join('') || '<div class="msgs-empty">Sin mensajes todavía.</div>';
-  if (wasAtBottom) mc.scrollTop = mc.scrollHeight;
-  loadMsgs(); // actualizar sidebar también
+async function refreshChat(pid,nom) {
+  if(selPat!==pid){clearInterval(msgPoll);return;}
+  const{data:allMsgs}=await sb.from('mensajes').select('*').eq('paciente_id',pid).order('created_at',{ascending:true});
+  const hiddenMap=JSON.parse(localStorage.getItem('hiddenChats')||'{}');
+  const hiddenTs=hiddenMap[pid];
+  const msgs=hiddenTs?(allMsgs||[]).filter(m=>m.created_at>hiddenTs):(allMsgs||[]);
+  const mc=$('chatMsgsA'); if(!mc)return;
+  const atBottom=mc.scrollHeight-mc.scrollTop-mc.clientHeight<60;
+  mc.innerHTML=msgs.map(m=>{
+    const ip=m.remitente==='psicologa';
+    return `<div><div class="msg ${ip?'msg-me':'msg-oth'}">${esc(m.contenido)}</div><div class="msg-t" style="text-align:${ip?'right':'left'}">${fmtT(m.created_at)}</div></div>`;
+  }).join('')||'<div class="msgs-empty">Sin mensajes todavía.</div>';
+  if(atBottom) mc.scrollTop=mc.scrollHeight;
+  loadMsgs();
 }
 
-async function sendAdMsg(pid, nom) {
-  const inp = $('adMsgIn'); if (!inp) return;
-  const txt = inp.value.trim(); if (!txt) return;
-  inp.value = '';
-  const { error } = await sb.from('mensajes').insert({
-    paciente_id: pid, remitente: 'psicologa', contenido: txt
-  });
-  if (error) { console.error('Error enviando mensaje:', error); return; }
-  // Actualizar chat inmediatamente
-  refreshChat(pid, nom);
+function borrarChat(pid, nom) {
+  if (!confirm(`¿Limpiar el chat con ${nom}? Solo vos dejás de verlo. El paciente seguirá viendo todo.`)) return;
+  // Guardar timestamp actual — solo se ocultan mensajes anteriores a este momento
+  const hiddenMap=JSON.parse(localStorage.getItem('hiddenChats')||'{}');
+  hiddenMap[pid]=new Date().toISOString();
+  localStorage.setItem('hiddenChats',JSON.stringify(hiddenMap));
+  // Limpiar vista
+  $('msgsChat').innerHTML='<div class="msgs-empty">Chat limpiado. Si el paciente te escribe, aparecerá acá.</div>';
+  selPat=null; if(msgPoll)clearInterval(msgPoll);
+  loadMsgs();
 }
 
-// ── REALTIME + POLLING ───────────────────────────────────────
+async function sendAdMsg(pid,nom) {
+  const inp=$('adMsgIn'); if(!inp)return; const txt=inp.value.trim(); if(!txt)return;
+  inp.value='';
+  await sb.from('mensajes').insert({paciente_id:pid,remitente:'psicologa',contenido:txt});
+  refreshChat(pid,nom);
+}
+
+// ── CONFIG ──
+function buildHChecks() {
+  $('hchecks').innerHTML=HORAS.map(h=>`<label class="hchk"><input type="checkbox" value="${h}" checked> ${h}</label>`).join('');
+}
+async function loadCfg() {
+  const{data}=await sb.from('config').select('*').single(); if(!data)return;
+  if(data.cbu)           $('cCBU').value=data.cbu;
+  if(data.alias)         $('cAlias').value=data.alias;
+  if(data.titular)       $('cTit').value=data.titular;
+  if(data.wsp_psicologa) $('cWsp').value=data.wsp_psicologa;
+  if(data.horarios)      document.querySelectorAll('#hchecks input').forEach(cb=>{cb.checked=data.horarios.includes(cb.value);});
+}
+async function saveCfg() {
+  const horarios=[...document.querySelectorAll('#hchecks input:checked')].map(c=>c.value);
+  const{error}=await sb.from('config').upsert({id:1,cbu:$('cCBU').value.trim(),alias:$('cAlias').value.trim(),titular:$('cTit').value.trim(),wsp_psicologa:$('cWsp').value.trim(),horarios});
+  const ok=$('cfgOk'); ok.style.display=error?'none':'block'; if(!error)setTimeout(()=>{ok.style.display='none';},2500);
+}
+
+// ── REALTIME + POLLING ──
 function subRT() {
   sb.channel('admin-rt')
-    .on('postgres_changes', {event:'*', schema:'public', table:'turnos'}, loadAll)
-    .on('postgres_changes', {event:'INSERT', schema:'public', table:'mensajes'}, () => {
-      loadMsgs();
-      if (selPat) refreshChat(selPat, '');
+    .on('postgres_changes',{event:'*',schema:'public',table:'turnos'},loadAll)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'mensajes'},()=>{
+      loadMsgs(); if(selPat)refreshChat(selPat,selNom);
     })
-    .subscribe((status) => { console.log('Realtime admin:', status); });
-
-  // Polling de respaldo mensajes cada 5 segundos
-  setInterval(() => {
-    loadMsgs();
-    if (selPat) refreshChat(selPat, '');
-  }, 5000);
-
-  // Polling turnos cada 15 segundos
-  setInterval(loadAll, 15000);
+    .subscribe();
+  setInterval(()=>{ loadMsgs(); if(selPat)refreshChat(selPat,selNom); },5000);
+  setInterval(loadAll,15000);
 }
 </script>
 </body>
