@@ -74,7 +74,7 @@
     .bx { background: var(--rose-light); color: var(--rose); }
 
     /* BOOKING */
-    .flow { display: flex; flex-direction: column; gap: 12px; max-width: 520px; }
+    .flow { display: flex; flex-direction: column; gap: 12px; max-width: 580px; margin: 0 auto; }
     .step { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 1.25rem; display: flex; gap: 14px; transition: opacity 0.2s; }
     .step.locked { opacity: 0.35; pointer-events: none; }
     .snum { width: 26px; height: 26px; border-radius: 50%; background: var(--sage-light); color: var(--sage-deep); font-weight: 500; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
@@ -196,7 +196,7 @@
 
     <!-- NUEVO TURNO -->
     <div class="sec" id="sec-n">
-      <div class="sh"><h2>Reservar turno</h2><p>Valor de la sesión: <strong>$40.000</strong></p></div>
+      <div class="sh" style="max-width:580px;margin:0 auto"><h2>Reservar turno</h2><p>Valor de la sesión: <strong>$40.000</strong></p></div>
       <div id="bookWrap">
         <div class="flow">
           <div class="step" id="st1">
