@@ -190,7 +190,7 @@
     <div class="logo-c">G</div>
     <h2>Acceso psicóloga</h2>
     <div class="err" id="loginErr"></div>
-    <div class="fg"><label>Email</label><input type="email" id="lEmail" placeholder="gracielacolli@gmail.com" autocomplete="email" inputmode="email"></div>
+    <div class="fg"><label>Email</label><input type="email" id="lEmail" placeholder="Tu email" autocomplete="email" inputmode="email"></div>
     <div class="fg"><label>Contraseña</label><input type="password" id="lPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <button class="btn-full" onclick="doLogin()">Ingresar</button>
     <p style="text-align:center;font-size:0.775rem;color:var(--text3);margin-top:1rem"><a href="index.html" style="color:var(--sage-deep);text-decoration:none">← Volver al inicio</a></p>
@@ -287,7 +287,7 @@
 <script>
 const SURL  = 'https://dzvfjedtjhlvwipnxzmi.supabase.co';
 const SKEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6dmZqZWR0amhsdndpcG54em1pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5NDc2NTMsImV4cCI6MjA5NDUyMzY1M30.5JcK7Ll67WIFoTY6Z00qiOEEbzh8nC3y1lmiBkuo8zU';
-const ADMIN = 'gracielacolli@gmail.com';
+const ADMIN = 'gracielacolli@hotmail.com';
 const sb = supabase.createClient(SURL, SKEY);
 const $ = id => document.getElementById(id);
 const HORAS = ['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00'];
