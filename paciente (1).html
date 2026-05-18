@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi cuenta · Consultorio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 15px; }
+    body { font-family: 'DM Sans', sans-serif; background: #f7f5f0; min-height: 100vh; color: #2c2c2c; -webkit-font-smoothing: antialiased; }
+    :root {
+      --sage: #7a9e8e; --sage-deep: #4d7a68; --sage-light: #eaf2ee; --sage-mid: #c2d9cf;
+      --warm: #f7f5f0; --warm2: #ede9e1; --rose: #c47b7b; --rose-light: #f7eded;
+      --amber-l: #fdf4e7; --blue-l: #eaf0fb; --blue-t: #2a4a8a;
+      --surface: #fff; --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.14);
+      --text: #2c2c2c; --text2: #6b6b6b; --text3: #a0a0a0; --r: 12px; --rs: 9px;
+    }
+
+    /* ── TOPNAV ── */
+    .topnav { height: 54px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 1.25rem; position: sticky; top: 0; z-index: 40; }
+    .brand { display: flex; align-items: center; gap: 8px; }
+    .brand-dot { width: 9px; height: 9px; background: var(--sage); border-radius: 50%; }
+    .brand-name { font-weight: 500; font-size: 0.875rem; }
+    .nav-r { display: flex; align-items: center; gap: 10px; }
+    .nav-user { font-size: 0.775rem; color: var(--text2); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .nav-avatar { display: none; width: 28px; height: 28px; border-radius: 50%; background: var(--sage-light); color: var(--sage-deep); font-size: 0.7rem; font-weight: 500; align-items: center; justify-content: center; flex-shrink: 0; }
+    @media (max-width: 680px) { .nav-user { display: none; } .nav-avatar { display: flex; } }
+    .nav-out { padding: 6px 14px; border: 1px solid var(--border2); border-radius: 20px; background: none; font-size: 0.775rem; cursor: pointer; color: var(--text2); font-family: 'DM Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+
+    /* ── LAYOUT ── */
+    .layout { display: flex; min-height: calc(100vh - 54px); }
+
+    /* SIDEBAR (desktop) */
+    .sidebar { width: 192px; background: var(--surface); border-right: 1px solid var(--border); padding: 1.25rem 0.75rem; display: flex; flex-direction: column; gap: 3px; flex-shrink: 0; }
+    .sb { display: flex; align-items: center; gap: 10px; padding: 10px 11px; border: none; background: none; border-radius: var(--rs); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; color: var(--text2); cursor: pointer; text-align: left; width: 100%; transition: all 0.12s; position: relative; -webkit-tap-highlight-color: transparent; }
+    .sb:hover { background: var(--warm); color: var(--text); }
+    .sb.on { background: var(--sage-light); color: var(--sage-deep); font-weight: 500; }
+    .sb-ico { font-size: 1.1rem; }
+    .rdot { width: 7px; height: 7px; background: var(--rose); border-radius: 50%; margin-left: auto; display: none; }
+    .rdot.show { display: block; }
+
+    /* BOTTOM NAV (mobile) */
+    .botnav { display: none; position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: var(--surface); border-top: 1px solid var(--border); z-index: 40; }
+    .botnav-inner { display: flex; height: 100%; }
+    .bnav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border: none; background: none; font-family: 'DM Sans', sans-serif; font-size: 0.62rem; color: var(--text3); cursor: pointer; position: relative; -webkit-tap-highlight-color: transparent; transition: color 0.12s; }
+    .bnav-btn.on { color: var(--sage-deep); }
+    .bnav-ico { font-size: 1.3rem; line-height: 1; }
+    .bnav-dot { position: absolute; top: 8px; right: calc(50% - 18px); width: 7px; height: 7px; background: var(--rose); border-radius: 50%; display: none; }
+    .bnav-dot.show { display: block; }
+
+    /* MAIN */
+    .main { flex: 1; padding: 1.5rem; overflow-y: auto; }
+    .sec { display: none; }
+    .sec.on { display: block; }
+    .sh { margin-bottom: 1.25rem; }
+    .sh h2 { font-family: 'DM Serif Display', serif; font-size: 1.4rem; font-weight: 400; }
+    .sh p { font-size: 0.8rem; color: var(--text2); margin-top: 3px; }
+
+    /* TURNOS */
+    .tlist { display: flex; flex-direction: column; gap: 10px; }
+    .tc { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 1rem 1.125rem; display: flex; gap: 12px; align-items: flex-start; transition: box-shadow 0.12s; }
+    .tc:hover { box-shadow: 0 2px 14px rgba(0,0,0,0.07); }
+    .av { width: 38px; height: 38px; border-radius: 50%; background: var(--sage-light); color: var(--sage-deep); font-size: 1.1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .tb { flex: 1; min-width: 0; }
+    .tt { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 3px; flex-wrap: wrap; }
+    .tn { font-weight: 500; font-size: 0.9rem; }
+    .tm { font-size: 0.775rem; color: var(--text2); margin-top: 2px; }
+    .badge { font-size: 0.7rem; padding: 3px 9px; border-radius: 20px; font-weight: 500; white-space: nowrap; }
+    .bp { background: var(--amber-l); color: #7a5e1a; }
+    .bpa { background: var(--blue-l); color: var(--blue-t); }
+    .bc { background: var(--sage-light); color: var(--sage-deep); }
+    .bx { background: var(--rose-light); color: var(--rose); }
+
+    /* BOOKING */
+    .flow { display: flex; flex-direction: column; gap: 12px; max-width: 580px; margin: 0 auto; }
+    .step { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 1.25rem; display: flex; gap: 14px; transition: opacity 0.2s; }
+    .step.locked { opacity: 0.35; pointer-events: none; }
+    .snum { width: 26px; height: 26px; border-radius: 50%; background: var(--sage-light); color: var(--sage-deep); font-weight: 500; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .sbody { flex: 1; min-width: 0; }
+    .sbody h3 { font-size: 0.9rem; font-weight: 500; margin-bottom: 0.75rem; }
+    .shint { font-size: 0.82rem; color: var(--text2); margin-bottom: 10px; line-height: 1.5; }
+
+    input[type=date], .inp {
+      width: 100%; padding: 11px 13px; border: 1px solid var(--border2);
+      border-radius: var(--rs); font-family: 'DM Sans', sans-serif; font-size: 1rem;
+      outline: none; transition: border-color 0.15s; -webkit-appearance: none;
+      background: var(--surface); color: var(--text);
+    }
+    input[type=date]:focus, .inp:focus { border-color: var(--sage); box-shadow: 0 0 0 3px rgba(122,158,142,0.12); }
+
+    .hgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; }
+    .hbtn { padding: 10px 4px; text-align: center; border: 1px solid var(--border2); border-radius: var(--rs); background: var(--surface); font-size: 0.82rem; cursor: pointer; color: var(--text); transition: all 0.12s; font-family: 'DM Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+    .hbtn:hover:not(:disabled) { border-color: var(--sage); background: var(--sage-light); }
+    .hbtn.sel { border-color: var(--sage); background: var(--sage-light); color: var(--sage-deep); font-weight: 500; }
+    .hbtn:disabled { color: var(--text3); text-decoration: line-through; background: var(--warm); cursor: default; }
+
+    .paybox { background: var(--warm); border-radius: var(--rs); padding: 12px 14px; margin-bottom: 12px; }
+    .payrow { display: flex; justify-content: space-between; font-size: 0.82rem; padding: 4px 0; gap: 8px; }
+    .payrow span { color: var(--text2); flex-shrink: 0; }
+    .payrow strong { text-align: right; word-break: break-all; }
+
+    .upload { display: flex; flex-direction: column; align-items: center; gap: 7px; border: 1.5px dashed rgba(0,0,0,0.18); border-radius: var(--r); padding: 1.5rem 1rem; cursor: pointer; transition: all 0.15s; color: var(--text2); font-size: 0.85rem; text-align: center; -webkit-tap-highlight-color: transparent; }
+    .upload:hover, .upload:active { border-color: var(--sage); background: var(--sage-light); }
+    .previmg { max-width: 100%; max-height: 180px; border-radius: var(--rs); margin-top: 10px; object-fit: contain; border: 1px solid var(--border); display: none; }
+
+    .sumbox { background: var(--warm); border-radius: var(--rs); padding: 12px 14px; margin-bottom: 12px; font-size: 0.875rem; line-height: 1.8; }
+
+    .btn-main { width: 100%; padding: 13px; background: var(--sage-deep); color: white; border: none; border-radius: var(--rs); font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 500; cursor: pointer; transition: background 0.15s; -webkit-tap-highlight-color: transparent; }
+    .btn-main:hover { background: #3d6655; }
+    .btn-main:disabled { opacity: 0.6; cursor: default; }
+    .btn-sec { padding: 9px 18px; background: var(--surface); color: var(--sage-deep); border: 1px solid var(--sage-mid); border-radius: var(--rs); font-family: 'DM Sans', sans-serif; font-size: 0.875rem; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+
+    .ok-banner { background: var(--sage-light); border: 1px solid var(--sage-mid); border-radius: var(--r); padding: 1.5rem; text-align: center; max-width: 520px; }
+    .ok-banner h3 { font-family: 'DM Serif Display', serif; font-size: 1.2rem; font-weight: 400; color: var(--sage-deep); margin-bottom: 6px; }
+    .ok-banner p { font-size: 0.85rem; color: var(--text2); line-height: 1.6; }
+    .ok-banner button { margin-top: 1rem; max-width: 200px; }
+
+    /* CHAT */
+    .chat-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); display: flex; flex-direction: column; }
+    .chat-msgs { overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 8px; }
+    .msg { max-width: 78%; padding: 9px 13px; border-radius: 14px; font-size: 0.875rem; line-height: 1.5; word-break: break-word; }
+    .msg-me  { background: var(--sage-light); align-self: flex-end; border-bottom-right-radius: 3px; }
+    .msg-oth { background: var(--warm2); align-self: flex-start; border-bottom-left-radius: 3px; }
+    .msg-t { font-size: 0.66rem; color: var(--text3); margin-top: 2px; }
+    .chat-in { border-top: 1px solid var(--border); padding: 10px; display: flex; gap: 7px; align-items: flex-end; }
+    .cinp { flex: 1; border: 1px solid var(--border2); border-radius: 20px; padding: 9px 14px; font-size: 0.9rem; font-family: 'DM Sans', sans-serif; resize: none; outline: none; transition: border-color 0.15s; -webkit-appearance: none; }
+    .cinp:focus { border-color: var(--sage); }
+    .csend { width: 38px; height: 38px; border-radius: 50%; background: var(--sage-deep); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; -webkit-tap-highlight-color: transparent; }
+
+    /* EMPTY */
+    .empty { text-align: center; padding: 2.5rem 1rem; color: var(--text3); font-size: 0.875rem; line-height: 1.7; }
+
+    /* LOADING */
+    .ovl { display: none; position: fixed; inset: 0; background: rgba(247,245,240,0.9); align-items: center; justify-content: center; z-index: 999; flex-direction: column; gap: 12px; }
+    .ovl.on { display: flex; }
+    .spin { width: 26px; height: 26px; border: 2px solid var(--sage-mid); border-top-color: var(--sage-deep); border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .ovl p { font-size: 0.875rem; color: var(--text2); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 680px) {
+      .sidebar { display: none; }
+      .botnav { display: block; }
+      .main { padding: 1rem 0.875rem; padding-bottom: 72px; }
+      .hgrid { grid-template-columns: repeat(3, 1fr); }
+      .chat-wrap { height: calc(100vh - 54px - 60px - 2rem); min-height: 300px; }
+      .chat-msgs { flex: 1; }
+      .nav-user { display: none; }
+      /* Booking flow en mobile */
+      .flow { gap: 10px; }
+      .step { padding: 1rem; gap: 10px; }
+      .payrow { font-size: 0.78rem; }
+      .payrow strong { font-size: 0.78rem; }
+      /* Turnos en mobile */
+      .tc { padding: 0.875rem; }
+      /* Botones mas grandes en mobile */
+      .btn-main { padding: 14px; font-size: 1rem; }
+      input[type=date], .inp { padding: 13px; font-size: 1rem; }
+      .hbtn { padding: 11px 4px; font-size: 0.85rem; }
+    }
+    @media (min-width: 681px) {
+      .chat-wrap { height: calc(100vh - 54px - 3rem - 60px); min-height: 360px; max-width: 640px; }
+      .chat-msgs { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="ovl" id="ov"><div class="spin"></div><p id="ovTxt">Verificando sesión...</p></div>
+
+<nav class="topnav">
+  <div class="brand"><span class="brand-dot"></span><span class="brand-name">Consultorio</span></div>
+  <div class="nav-r">
+    <span class="nav-user" id="navUser"></span>
+    <div class="nav-avatar" id="navAvatar"></div>
+    <button class="nav-out" onclick="doLogout()">Salir</button>
+  </div>
+</nav>
+
+<div class="layout">
+  <!-- SIDEBAR desktop -->
+  <aside class="sidebar">
+    <button class="sb on" id="sb-t" onclick="showSec('t')"><span class="sb-ico">📅</span> Mis turnos</button>
+    <button class="sb"    id="sb-n" onclick="showSec('n')"><span class="sb-ico">➕</span> Nuevo turno</button>
+    <button class="sb"    id="sb-m" onclick="showSec('m')"><span class="sb-ico">💬</span> Mensajes <span class="rdot" id="rdot"></span></button>
+  </aside>
+
+  <div class="main">
+    <!-- MIS TURNOS -->
+    <div class="sec on" id="sec-t">
+      <div class="sh"><h2>Mis turnos</h2></div>
+      <div class="tlist" id="tlist"><div class="empty">Cargando...</div></div>
+    </div>
+
+    <!-- NUEVO TURNO -->
+    <div class="sec" id="sec-n">
+      <div class="sh" style="max-width:580px;margin:0 auto"><h2>Reservar turno</h2><p>Valor de la sesión: <strong>$40.000</strong></p></div>
+      <div id="bookWrap">
+        <div class="flow">
+          <div class="step" id="st1">
+            <div class="snum">1</div>
+            <div class="sbody">
+              <h3>Elegí fecha y horario</h3>
+              <input type="date" id="bFecha" onchange="onFecha()">
+              <div class="hgrid" id="hgrid" style="display:none"></div>
+            </div>
+          </div>
+          <div class="step locked" id="st2">
+            <div class="snum">2</div>
+            <div class="sbody">
+              <h3>Subí el comprobante de pago</h3>
+              <p class="shint">Transferí <strong>$40.000</strong> a los datos de abajo y adjuntá el comprobante.</p>
+              <div class="paybox">
+                <div class="payrow"><span>CBU</span><strong id="pCBU">—</strong></div>
+                <div class="payrow"><span>Alias</span><strong id="pAlias">—</strong></div>
+                <div class="payrow"><span>Titular</span><strong id="pTit">—</strong></div>
+              </div>
+              <label class="upload" for="compFile">
+                <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span id="uplLabel">Tocá para subir imagen del comprobante</span>
+                <span style="font-size:0.72rem;color:var(--text3)">JPG, PNG o PDF</span>
+              </label>
+              <input type="file" id="compFile" accept="image/*,application/pdf" style="display:none" onchange="onComp(this)">
+              <img id="prevImg" class="previmg" alt="">
+            </div>
+          </div>
+          <div class="step locked" id="st3">
+            <div class="snum">3</div>
+            <div class="sbody">
+              <h3>Confirmar solicitud</h3>
+              <div class="sumbox" id="sumbox"></div>
+              <button class="btn-main" id="btnEnv" onclick="enviar()">Enviar solicitud</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="okWrap" style="display:none">
+        <div class="ok-banner">
+          <h3>✓ Solicitud enviada</h3>
+          <p id="okTxt"></p>
+          <button class="btn-main" onclick="resetBook()">Nueva solicitud</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MENSAJES -->
+    <div class="sec" id="sec-m">
+      <div class="sh"><h2>Mensajes</h2><p>Comunicación directa con la psicóloga</p></div>
+      <div class="chat-wrap">
+        <div class="chat-msgs" id="chatMsgs"><div class="empty">Cargando mensajes...</div></div>
+        <div class="chat-in">
+          <textarea class="cinp" id="msgInp" placeholder="Escribí tu mensaje..." rows="1"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
+          <button class="csend" onclick="sendMsg()">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV mobile -->
+<nav class="botnav">
+  <div class="botnav-inner">
+    <button class="bnav-btn on" id="bn-t" onclick="showSec('t')">
+      <span class="bnav-ico">📅</span><span>Turnos</span>
+    </button>
+    <button class="bnav-btn" id="bn-n" onclick="showSec('n')">
+      <span class="bnav-ico">➕</span><span>Nuevo</span>
+    </button>
+    <button class="bnav-btn" id="bn-m" onclick="showSec('m')">
+      <span class="bnav-ico">💬</span><span>Mensajes</span>
+      <span class="bnav-dot" id="bndot"></span>
+    </button>
+  </div>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+const SURL = 'https://dzvfjedtjhlvwipnxzmi.supabase.co';
+const SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6dmZqZWR0amhsdndpcG54em1pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5NDc2NTMsImV4cCI6MjA5NDUyMzY1M30.5JcK7Ll67WIFoTY6Z00qiOEEbzh8nC3y1lmiBkuo8zU';
+const ADMIN = 'gracielacolli@hotmail.com';
+const sb = supabase.createClient(SURL, SKEY);
+const $ = id => document.getElementById(id);
+
+let user = null, paciente = null, selFecha = null, selHora = null, compFile = null;
+const LABELS = { pendiente_pago:'Esperando confirmación', pago_enviado:'Comprobante enviado', confirmado:'Confirmado ✓', cancelado:'Cancelado' };
+const BCLS   = { pendiente_pago:'bp', pago_enviado:'bpa', confirmado:'bc', cancelado:'bx' };
+
+function ov(t) { $('ovTxt').textContent = t; $('ov').classList.add('on'); }
+function offOv() { $('ov').classList.remove('on'); }
+function fmtF(f) { if(!f) return ''; const [y,m,d]=f.split('-'); const M=['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']; return `${parseInt(d)} ${M[parseInt(m)]} ${y}`; }
+function fmtT(ts) { return ts ? new Date(ts).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}) : ''; }
+function esc(t) { return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── INIT ──────────────────────────────────────────────────────
+ov('Verificando sesión...');
+sb.auth.getSession().then(async ({ data }) => {
+  if (!data.session) { window.location.replace('index.html'); return; }
+  if (data.session.user.email === ADMIN) { window.location.replace('admin.html'); return; }
+  user = data.session.user;
+  const displayName = user.user_metadata?.nombre || user.user_metadata?.full_name || user.email;
+  $('navUser').textContent = displayName;
+  const initials = displayName.split(' ').slice(0,2).map(x=>x[0]||'').join('').toUpperCase() || '?';
+  $('navAvatar').textContent = initials;
+  const { data: p } = await sb.from('pacientes').select('*').eq('user_id', user.id).single();
+  paciente = p;
+  if (!p) {
+    // Sin perfil aún — insertar. Aplica a Google y a email/pass recién confirmados.
+    const nombre = user.user_metadata?.full_name || user.user_metadata?.name || user.user_metadata?.nombre || '';
+    const tel    = user.user_metadata?.tel || '';
+    const { data: nuevo } = await sb.from('pacientes')
+      .insert({ user_id: user.id, nombre, tel, email: user.email })
+      .select().single();
+    paciente = nuevo || { nombre, tel, email: user.email };
+  } else if (!p.nombre) {
+    // Perfil existe pero sin nombre (Google anterior al fix) — actualizar
+    const nombre = user.user_metadata?.full_name || user.user_metadata?.name || '';
+    if (nombre) {
+      await sb.from('pacientes').update({ nombre }).eq('user_id', user.id);
+      paciente = { ...p, nombre };
+    }
+  }
+  const man = new Date(); man.setDate(man.getDate()+1); $('bFecha').min = man.toISOString().split('T')[0];
+  offOv();
+  loadCfg(); loadTurnos(); loadMsgs(); subRT();
+}).catch(() => { offOv(); window.location.replace('index.html'); });
+
+async function doLogout() { await sb.auth.signOut(); window.location.replace('index.html'); }
+
+// ── SECCIONES ─────────────────────────────────────────────────
+function showSec(id) {
+  ['t','n','m'].forEach(x => {
+    $('sec-'+x).classList.toggle('on', x===id);
+    $('sb-'+x)?.classList.toggle('on', x===id);
+    $('bn-'+x)?.classList.toggle('on', x===id);
+  });
+  if (id === 'm') { $('rdot').classList.remove('show'); $('bndot').classList.remove('show'); markRead(); }
+}
+
+// ── TURNOS ────────────────────────────────────────────────────
+async function loadTurnos() {
+  const { data } = await sb.from('turnos').select('*').eq('paciente_id', user.id).order('fecha').order('hora');
+  const el = $('tlist');
+  if (!data?.length) {
+    el.innerHTML = `<div class="empty">Todavía no tenés turnos.<br><br><button class="btn-sec" onclick="showSec('n')">Reservar mi primer turno</button></div>`; return;
+  }
+  el.innerHTML = data.map(t => `
+    <div class="tc">
+      <div class="av">📅</div>
+      <div class="tb">
+        <div class="tt">
+          <div class="tn">${fmtF(t.fecha)} · ${t.hora} hs</div>
+          <span class="badge ${BCLS[t.estado]||''}">${LABELS[t.estado]||t.estado}</span>
+        </div>
+        ${t.motivo ? `<div class="tm">"${esc(t.motivo)}"</div>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+// ── CONFIG ────────────────────────────────────────────────────
+async function loadCfg() {
+  const { data } = await sb.from('config').select('*').single();
+  if (!data) return;
+  $('pCBU').textContent   = data.cbu   || '—';
+  $('pAlias').textContent = data.alias || '—';
+  $('pTit').textContent   = data.titular || '—';
+  window._horas = data.horarios || [];
+}
+
+// ── BOOKING ───────────────────────────────────────────────────
+async function onFecha() {
+  selFecha = $('bFecha').value; selHora = null;
+  if (!selFecha) return;
+  const { data: occ } = await sb.from('turnos').select('hora').eq('fecha', selFecha).neq('estado','cancelado');
+  const ocupadas = (occ||[]).map(x=>x.hora);
+  const horas = window._horas?.length ? window._horas : ['09:00','09:30','10:00','10:30','11:00','11:30','12:00','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00'];
+  const g = $('hgrid'); g.style.display = 'grid';
+  g.innerHTML = horas.map(h => `<button class="hbtn" onclick="selH(this,'${h}')" ${ocupadas.includes(h)?'disabled':''}>${h}</button>`).join('');
+  $('st2').classList.add('locked'); $('st3').classList.add('locked');
+}
+
+function selH(btn, h) {
+  document.querySelectorAll('.hbtn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel'); selHora = h;
+  $('st2').classList.remove('locked');
+}
+
+function onComp(inp) {
+  if (!inp.files[0]) return;
+  compFile = inp.files[0];
+  $('uplLabel').textContent = compFile.name;
+  if (compFile.type.startsWith('image/')) {
+    const img = $('prevImg'); img.src = URL.createObjectURL(compFile); img.style.display = 'block';
+  }
+  $('st3').classList.remove('locked');
+  $('sumbox').innerHTML = `<strong>${fmtF(selFecha)}</strong> a las <strong>${selHora} hs</strong><br>Monto: <strong>$40.000</strong><br><em style="color:var(--text2)">Pendiente de confirmación</em>`;
+}
+
+async function enviar() {
+  const btn = $('btnEnv'); btn.disabled=true; btn.textContent='Enviando...'; ov('Enviando solicitud...');
+  let compURL = null;
+  if (compFile) {
+    const ext = compFile.name.split('.').pop();
+    const path = `comprobantes/${user.id}_${Date.now()}.${ext}`;
+    const { error: ue } = await sb.storage.from('comprobantes').upload(path, compFile);
+    if (!ue) { const { data: ud } = sb.storage.from('comprobantes').getPublicUrl(path); compURL = ud.publicUrl; }
+  }
+  const nombre = paciente?.nombre || user.user_metadata?.full_name || user.user_metadata?.nombre || user.email;
+  const { error } = await sb.from('turnos').insert({ paciente_id:user.id, paciente_nombre:nombre, paciente_tel:paciente?.tel||'', fecha:selFecha, hora:selHora, estado:compURL?'pago_enviado':'pendiente_pago', comprobante_url:compURL });
+  offOv(); btn.disabled=false; btn.textContent='Enviar solicitud';
+  if (error) { alert('Error: '+error.message); return; }
+  $('okTxt').textContent = `Solicitud enviada para el ${fmtF(selFecha)} a las ${selHora} hs. Graciela revisará el comprobante y confirmará tu turno.`;
+  $('bookWrap').style.display='none'; $('okWrap').style.display='block';
+  loadTurnos();
+}
+
+function resetBook() {
+  selFecha=null; selHora=null; compFile=null;
+  $('bFecha').value=''; $('hgrid').style.display='none';
+  $('prevImg').style.display='none'; $('compFile').value='';
+  $('uplLabel').textContent='Tocá para subir imagen del comprobante';
+  $('st2').classList.add('locked'); $('st3').classList.add('locked');
+  $('bookWrap').style.display='block'; $('okWrap').style.display='none';
+}
+
+// ── MENSAJES ──────────────────────────────────────────────────
+let msgPolling = null;
+
+async function loadMsgs() {
+  const { data, error } = await sb.from('mensajes')
+    .select('*')
+    .eq('paciente_id', user.id)
+    .order('created_at', { ascending: true });
+
+  if (error) { console.error('Error mensajes:', error); return; }
+
+  const el = $('chatMsgs');
+  const wasAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+
+  if (!data?.length) {
+    el.innerHTML = '<div class="empty">Todavía no hay mensajes.<br>¡Escribile a la psicóloga!</div>';
+    return;
+  }
+
+  el.innerHTML = data.map(m => {
+    const isMe = m.remitente === 'paciente';
+    return `<div>
+      <div class="msg ${isMe ? 'msg-me' : 'msg-oth'}">${esc(m.contenido)}</div>
+      <div class="msg-t" style="text-align:${isMe?'right':'left'}">${fmtT(m.created_at)}</div>
+    </div>`;
+  }).join('');
+
+  if (wasAtBottom || el.scrollTop === 0) el.scrollTop = el.scrollHeight;
+
+  // Badge mensajes no leídos
+  const unread = data.filter(m => m.remitente === 'psicologa' && !m.leido).length;
+  if (unread && !$('sec-m').classList.contains('on')) {
+    $('rdot').classList.add('show'); $('bndot').classList.add('show');
+  }
+}
+
+async function sendMsg() {
+  const inp = $('msgInp'), txt = inp.value.trim(); if (!txt) return;
+  inp.value = '';
+  const { error } = await sb.from('mensajes').insert({
+    paciente_id: user.id, remitente: 'paciente', contenido: txt
+  });
+  if (error) { console.error('Error enviando:', error); return; }
+  loadMsgs();
+}
+
+async function markRead() {
+  await sb.from('mensajes').update({ leido: true }).eq('paciente_id', user.id).eq('remitente', 'psicologa');
+}
+
+// ── REALTIME + POLLING RESPALDO ───────────────────────────────
+function subRT() {
+  // Realtime (requiere Publications activo en Supabase)
+  sb.channel('pac-rt-' + user.id)
+    .on('postgres_changes', {
+      event: 'INSERT', schema: 'public', table: 'mensajes',
+      filter: 'paciente_id=eq.' + user.id
+    }, () => loadMsgs())
+    .subscribe((status) => { console.log('Realtime paciente:', status); });
+
+  // Polling de respaldo cada 5 segundos
+  setInterval(loadMsgs, 5000);
+}
+</script>
+</body>
+</html>
