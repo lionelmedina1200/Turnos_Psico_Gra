@@ -158,51 +158,20 @@ function showError(msg) {
   `;
 }
 
-// Supabase puede mandar el token de 3 formas distintas:
-// 1. Hash fragment: #access_token=...&type=signup  (formato legacy)
-// 2. Query param:  ?token_hash=...&type=email       (formato PKCE nuevo)
-// 3. Sin params:   Supabase ya procesó todo y la sesión está lista
-async function confirmar() {
-  try {
-    // Primero intentar desde el hash (#access_token=...)
-    const hash = window.location.hash.substring(1);
-    if (hash) {
-      const hp = new URLSearchParams(hash);
-      const accessToken  = hp.get('access_token');
-      const refreshToken = hp.get('refresh_token');
-      if (accessToken) {
-        const { data, error } = await sb.auth.setSession({ access_token: accessToken, refresh_token: refreshToken || '' });
-        if (error) { showError(); return; }
-        showSuccess(data.user?.email);
-        return;
-      }
-    }
-
-    // Segundo: query params (?token_hash=...&type=...)
-    const qp = new URLSearchParams(window.location.search);
-    const tokenHash = qp.get('token_hash');
-    const type      = qp.get('type');
-    if (tokenHash && type) {
-      const otpType = (type === 'signup' || type === 'email') ? 'email' : type;
-      const { data, error } = await sb.auth.verifyOtp({ token_hash: tokenHash, type: otpType });
-      if (error) { showError(); return; }
-      showSuccess(data.user?.email);
-      return;
-    }
-
-    // Tercero: Supabase PKCE ya procesó todo automáticamente — esperar sesión
-    // A veces tarda un instante, reintentamos hasta 3 veces
-    for (let i = 0; i < 3; i++) {
-      const { data: { session } } = await sb.auth.getSession();
-      if (session) { showSuccess(session.user?.email); return; }
-      if (i < 2) await new Promise(r => setTimeout(r, 800));
-    }
-
-    // Nada funcionó
+// Supabase procesa el token internamente y redirige limpio a /confirm.html
+// La única forma confiable es escuchar onAuthStateChange
+function confirmar() {
+  // Timeout por si el evento nunca llega (link expirado, ya usado, etc.)
+  const timeout = setTimeout(() => {
     showError('El link de confirmación expiró o ya fue usado. Podés intentar registrarte de nuevo.');
-  } catch (e) {
-    showError();
-  }
+  }, 6000);
+
+  sb.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+      clearTimeout(timeout);
+      showSuccess(session?.user?.email);
+    }
+  });
 }
 
 confirmar();
