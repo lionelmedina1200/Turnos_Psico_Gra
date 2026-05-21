@@ -542,7 +542,26 @@ async function notifNuevoTurno(t) {
 💳 Pago: ${estado}
 
 Entrá al panel para revisarlo.`;
-  window.open('https://wa.me/' + cfg.wsp_psicologa.replace(/[^0-9]/g,'') + '?text=' + encodeURIComponent(msg), '_blank');
+  const url = 'https://wa.me/' + cfg.wsp_psicologa.replace(/[^0-9]/g,'') + '?text=' + encodeURIComponent(msg);
+  // Mostrar banner con botón — window.open desde async es bloqueado por el browser
+  let banner = document.getElementById('notifBanner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'notifBanner';
+    banner.style.cssText = 'position:fixed;top:62px;right:16px;z-index:200;background:#fff;border:1px solid rgba(0,0,0,.1);border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,.12);padding:14px 16px;max-width:300px;font-family:DM Sans,sans-serif;font-size:.85rem;animation:fi .2s ease';
+    document.body.appendChild(banner);
+  }
+  banner.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+      <div>
+        <div style="font-weight:500;margin-bottom:4px">🔔 Nuevo turno</div>
+        <div style="color:#6b6b6b;line-height:1.4">${t.paciente_nombre||'—'} · ${fmtF(t.fecha)} ${t.hora} hs<br>${estado}</div>
+      </div>
+      <button onclick="document.getElementById('notifBanner').remove()" style="border:none;background:none;cursor:pointer;color:#aaa;font-size:1.1rem;line-height:1;padding:0">×</button>
+    </div>
+    <a href="${url}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:8px 14px;background:#25D366;color:white;border-radius:8px;text-decoration:none;font-size:.82rem;font-weight:500">📲 Avisar por WhatsApp</a>
+  `;
+  setTimeout(() => { const b = document.getElementById('notifBanner'); if(b) b.remove(); }, 30000);
 }
 async function cancelar(id) { if(!confirm('¿Cancelar este turno?'))return; await sb.from('turnos').update({estado:'cancelado'}).eq('id',id); loadAll(); }
 

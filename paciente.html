@@ -301,13 +301,22 @@ sb.auth.getSession().then(async ({ data }) => {
   if (!data.session) { window.location.replace('index.html'); return; }
   if (data.session.user.email === ADMIN) { window.location.replace('admin.html'); return; }
   user = data.session.user;
-  $('navUser').textContent = user.user_metadata?.nombre || user.user_metadata?.full_name || user.email;
-  const { data: p } = await sb.from('pacientes').select('*').eq('user_id', user.id).single();
-  paciente = p;
-  if (!p) {
-    const nombre = user.user_metadata?.full_name || user.user_metadata?.nombre || '';
-    if (nombre) { await sb.from('pacientes').insert({ user_id: user.id, nombre, email: user.email }); paciente = { nombre, email: user.email }; }
-  }
+  const displayName = user.user_metadata?.nombre || user.user_metadata?.full_name || user.user_metadata?.name || user.email;
+  $('navUser').textContent = displayName;
+  const initials = displayName.split(' ').slice(0,2).map(x=>x[0]||'').join('').toUpperCase() || '?';
+  if($('navAvatar')) $('navAvatar').textContent = initials;
+  try {
+    const { data: p } = await sb.from('pacientes').select('*').eq('user_id', user.id).single();
+    paciente = p;
+    if (!p) {
+      const nombre = user.user_metadata?.full_name || user.user_metadata?.name || user.user_metadata?.nombre || '';
+      const { data: nuevo } = await sb.from('pacientes').insert({ user_id: user.id, nombre, email: user.email }).select().single();
+      paciente = nuevo || { nombre, email: user.email };
+    } else if (!p.nombre) {
+      const nombre = user.user_metadata?.full_name || user.user_metadata?.name || '';
+      if (nombre) { await sb.from('pacientes').update({ nombre }).eq('user_id', user.id); paciente = { ...p, nombre }; }
+    }
+  } catch(e) { console.warn('Perfil paciente:', e); }
   const man = new Date(); man.setDate(man.getDate()+1); $('bFecha').min = man.toISOString().split('T')[0];
   offOv();
   loadCfg(); loadTurnos(); loadMsgs(); subRT();
@@ -349,21 +358,41 @@ async function loadTurnos() {
 }
 
 // ── CANCELAR TURNO (paciente) ────────────────────────────────
+// Modal liviano para aviso de cancelación
+function showCancelModal(html) {
+  let ov = document.getElementById('cancelOv');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.id = 'cancelOv';
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;display:flex;align-items:center;justify-content:center;padding:1rem';
+    document.body.appendChild(ov);
+  }
+  ov.innerHTML = `<div style="background:#fff;border-radius:16px;padding:1.5rem;max-width:360px;width:100%;text-align:center">${html}</div>`;
+  ov.onclick = e => { if(e.target===ov) ov.remove(); };
+}
+
 async function cancelarTurno(id) {
   if (!confirm('¿Cancelar este turno? Esta acción no se puede deshacer.')) return;
+  const { data: t } = await sb.from('turnos').select('*').eq('id', id).single();
   const { error } = await sb.from('turnos').update({ estado: 'cancelado' }).eq('id', id);
   if (error) { alert('Error al cancelar: ' + error.message); return; }
-  // Avisar a Graciela por WhatsApp
-  const t = (await sb.from('turnos').select('*').eq('id', id).single()).data;
+  loadTurnos();
+  // Mostrar modal con botón WhatsApp (no window.open directo para evitar bloqueo)
   const { data: cfg } = await sb.from('config').select('wsp_psicologa').single();
   if (cfg?.wsp_psicologa && t) {
     const msg = `⚠️ Turno cancelado por el paciente
 👤 ${t.paciente_nombre||'—'}
 📅 ${fmtF(t.fecha)}
 🕐 ${t.hora} hs`;
-    window.open('https://wa.me/' + cfg.wsp_psicologa.replace(/\D/g,'') + '?text=' + encodeURIComponent(msg), '_blank');
+    const url = 'https://wa.me/' + cfg.wsp_psicologa.replace(/[^0-9]/g,'') + '?text=' + encodeURIComponent(msg);
+    showCancelModal(`
+      <div style="font-size:2rem;margin-bottom:.75rem">✅</div>
+      <h3 style="font-family:'DM Serif Display',serif;font-weight:400;margin-bottom:.5rem;color:#4d7a68">Turno cancelado</h3>
+      <p style="font-size:.875rem;color:#6b6b6b;margin-bottom:1rem;line-height:1.5">Avisale a Graciela por WhatsApp para que esté al tanto.</p>
+      <a href="${url}" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:11px 20px;background:#25D366;color:white;border-radius:10px;text-decoration:none;font-size:.9rem;font-weight:500;margin-bottom:.75rem">📲 Avisar por WhatsApp</a><br>
+      <button onclick="document.getElementById('cancelOv').remove()" style="margin-top:.5rem;padding:8px 18px;border:1px solid #ddd;border-radius:8px;background:none;cursor:pointer;font-size:.85rem">Cerrar</button>
+    `);
   }
-  loadTurnos();
 }
 
 // ── CONFIG ────────────────────────────────────────────────────
