@@ -25,8 +25,6 @@
     .brand-name { font-weight: 500; font-size: 0.875rem; }
     .nav-r { display: flex; align-items: center; gap: 10px; }
     .nav-user { font-size: 0.775rem; color: var(--text2); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .nav-avatar { display: none; width: 28px; height: 28px; border-radius: 50%; background: var(--sage-light); color: var(--sage-deep); font-size: 0.7rem; font-weight: 500; align-items: center; justify-content: center; flex-shrink: 0; }
-    @media (max-width: 680px) { .nav-user { display: none; } .nav-avatar { display: flex; } }
     .nav-out { padding: 6px 14px; border: 1px solid var(--border2); border-radius: 20px; background: none; font-size: 0.775rem; cursor: pointer; color: var(--text2); font-family: 'DM Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
 
     /* ── LAYOUT ── */
@@ -74,7 +72,7 @@
     .bx { background: var(--rose-light); color: var(--rose); }
 
     /* BOOKING */
-    .flow { display: flex; flex-direction: column; gap: 12px; max-width: 580px; margin: 0 auto; }
+    .flow { display: flex; flex-direction: column; gap: 12px; max-width: 520px; }
     .step { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 1.25rem; display: flex; gap: 14px; transition: opacity 0.2s; }
     .step.locked { opacity: 0.35; pointer-events: none; }
     .snum { width: 26px; height: 26px; border-radius: 50%; background: var(--sage-light); color: var(--sage-deep); font-weight: 500; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
@@ -116,6 +114,8 @@
     .ok-banner h3 { font-family: 'DM Serif Display', serif; font-size: 1.2rem; font-weight: 400; color: var(--sage-deep); margin-bottom: 6px; }
     .ok-banner p { font-size: 0.85rem; color: var(--text2); line-height: 1.6; }
     .ok-banner button { margin-top: 1rem; max-width: 200px; }
+    .btn-cancel-turno { padding: 6px 14px; border: 1px solid var(--rose); border-radius: 20px; background: none; color: var(--rose); font-size: 0.775rem; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.12s; -webkit-tap-highlight-color: transparent; }
+    .btn-cancel-turno:hover { background: var(--rose-light); }
 
     /* CHAT */
     .chat-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); display: flex; flex-direction: column; }
@@ -174,7 +174,6 @@
   <div class="brand"><span class="brand-dot"></span><span class="brand-name">Consultorio</span></div>
   <div class="nav-r">
     <span class="nav-user" id="navUser"></span>
-    <div class="nav-avatar" id="navAvatar"></div>
     <button class="nav-out" onclick="doLogout()">Salir</button>
   </div>
 </nav>
@@ -196,7 +195,7 @@
 
     <!-- NUEVO TURNO -->
     <div class="sec" id="sec-n">
-      <div class="sh" style="max-width:580px;margin:0 auto"><h2>Reservar turno</h2><p>Valor de la sesión: <strong>$40.000</strong></p></div>
+      <div class="sh"><h2>Reservar turno</h2><p>Valor de la sesión: <strong>$40.000</strong></p></div>
       <div id="bookWrap">
         <div class="flow">
           <div class="step" id="st1">
@@ -302,27 +301,12 @@ sb.auth.getSession().then(async ({ data }) => {
   if (!data.session) { window.location.replace('index.html'); return; }
   if (data.session.user.email === ADMIN) { window.location.replace('admin.html'); return; }
   user = data.session.user;
-  const displayName = user.user_metadata?.nombre || user.user_metadata?.full_name || user.email;
-  $('navUser').textContent = displayName;
-  const initials = displayName.split(' ').slice(0,2).map(x=>x[0]||'').join('').toUpperCase() || '?';
-  $('navAvatar').textContent = initials;
+  $('navUser').textContent = user.user_metadata?.nombre || user.user_metadata?.full_name || user.email;
   const { data: p } = await sb.from('pacientes').select('*').eq('user_id', user.id).single();
   paciente = p;
   if (!p) {
-    // Sin perfil aún — insertar. Aplica a Google y a email/pass recién confirmados.
-    const nombre = user.user_metadata?.full_name || user.user_metadata?.name || user.user_metadata?.nombre || '';
-    const tel    = user.user_metadata?.tel || '';
-    const { data: nuevo } = await sb.from('pacientes')
-      .insert({ user_id: user.id, nombre, tel, email: user.email })
-      .select().single();
-    paciente = nuevo || { nombre, tel, email: user.email };
-  } else if (!p.nombre) {
-    // Perfil existe pero sin nombre (Google anterior al fix) — actualizar
-    const nombre = user.user_metadata?.full_name || user.user_metadata?.name || '';
-    if (nombre) {
-      await sb.from('pacientes').update({ nombre }).eq('user_id', user.id);
-      paciente = { ...p, nombre };
-    }
+    const nombre = user.user_metadata?.full_name || user.user_metadata?.nombre || '';
+    if (nombre) { await sb.from('pacientes').insert({ user_id: user.id, nombre, email: user.email }); paciente = { nombre, email: user.email }; }
   }
   const man = new Date(); man.setDate(man.getDate()+1); $('bFecha').min = man.toISOString().split('T')[0];
   offOv();
@@ -348,8 +332,9 @@ async function loadTurnos() {
   if (!data?.length) {
     el.innerHTML = `<div class="empty">Todavía no tenés turnos.<br><br><button class="btn-sec" onclick="showSec('n')">Reservar mi primer turno</button></div>`; return;
   }
-  el.innerHTML = data.map(t => `
-    <div class="tc">
+  el.innerHTML = data.map(t => {
+    const puedeCancelar = ['pendiente_pago','pago_enviado'].includes(t.estado);
+    return `<div class="tc">
       <div class="av">📅</div>
       <div class="tb">
         <div class="tt">
@@ -357,8 +342,28 @@ async function loadTurnos() {
           <span class="badge ${BCLS[t.estado]||''}">${LABELS[t.estado]||t.estado}</span>
         </div>
         ${t.motivo ? `<div class="tm">"${esc(t.motivo)}"</div>` : ''}
+        ${puedeCancelar ? `<div style="margin-top:8px"><button class="btn-cancel-turno" onclick="cancelarTurno('${t.id}')">Cancelar turno</button></div>` : ''}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
+}
+
+// ── CANCELAR TURNO (paciente) ────────────────────────────────
+async function cancelarTurno(id) {
+  if (!confirm('¿Cancelar este turno? Esta acción no se puede deshacer.')) return;
+  const { error } = await sb.from('turnos').update({ estado: 'cancelado' }).eq('id', id);
+  if (error) { alert('Error al cancelar: ' + error.message); return; }
+  // Avisar a Graciela por WhatsApp
+  const t = (await sb.from('turnos').select('*').eq('id', id).single()).data;
+  const { data: cfg } = await sb.from('config').select('wsp_psicologa').single();
+  if (cfg?.wsp_psicologa && t) {
+    const msg = `⚠️ Turno cancelado por el paciente
+👤 ${t.paciente_nombre||'—'}
+📅 ${fmtF(t.fecha)}
+🕐 ${t.hora} hs`;
+    window.open('https://wa.me/' + cfg.wsp_psicologa.replace(/\D/g,'') + '?text=' + encodeURIComponent(msg), '_blank');
+  }
+  loadTurnos();
 }
 
 // ── CONFIG ────────────────────────────────────────────────────
@@ -368,7 +373,10 @@ async function loadCfg() {
   $('pCBU').textContent   = data.cbu   || '—';
   $('pAlias').textContent = data.alias || '—';
   $('pTit').textContent   = data.titular || '—';
-  window._horas = data.horarios || [];
+  window._horas   = data.horarios || [];
+  window._precio  = data.precio   || '$40.000';
+  // Actualizar precio donde se muestre
+  document.querySelectorAll('.precio-sesion').forEach(el => el.textContent = window._precio);
 }
 
 // ── BOOKING ───────────────────────────────────────────────────
@@ -397,7 +405,7 @@ function onComp(inp) {
     const img = $('prevImg'); img.src = URL.createObjectURL(compFile); img.style.display = 'block';
   }
   $('st3').classList.remove('locked');
-  $('sumbox').innerHTML = `<strong>${fmtF(selFecha)}</strong> a las <strong>${selHora} hs</strong><br>Monto: <strong>$40.000</strong><br><em style="color:var(--text2)">Pendiente de confirmación</em>`;
+  $('sumbox').innerHTML = `<strong>${fmtF(selFecha)}</strong> a las <strong>${selHora} hs</strong><br>Monto: <strong>${window._precio||'$40.000'}</strong><br><em style="color:var(--text2)">Pendiente de confirmación</em>`;
 }
 
 async function enviar() {
