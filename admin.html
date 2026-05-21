@@ -379,6 +379,7 @@
         <div class="cfg-grid">
           <div class="cfg-card">
             <h3>Datos de pago</h3>
+            <div class="fg"><label>Precio de la sesión</label><input id="cPrecio" placeholder="$40.000"></div>
             <div class="fg"><label>CBU</label><input id="cCBU" placeholder="CBU"></div>
             <div class="fg"><label>Alias</label><input id="cAlias" placeholder="alias.mp"></div>
             <div class="fg"><label>Titular</label><input id="cTit" placeholder="Nombre Apellido"></div>
@@ -529,6 +530,20 @@ function renderSol() {
 }
 
 async function confirmar(id) { await sb.from('turnos').update({estado:'confirmado'}).eq('id',id); await loadAll(); prepWsp(id); }
+
+async function notifNuevoTurno(t) {
+  const { data:cfg } = await sb.from('config').select('wsp_psicologa').single();
+  if (!cfg?.wsp_psicologa) return;
+  const estado = t.estado === 'pago_enviado' ? 'con comprobante adjunto ✅' : 'sin comprobante aún ⚠️';
+  const msg = `🔔 Nueva solicitud de turno
+👤 ${t.paciente_nombre||'—'}
+📅 ${fmtF(t.fecha)}
+🕐 ${t.hora} hs
+💳 Pago: ${estado}
+
+Entrá al panel para revisarlo.`;
+  window.open('https://wa.me/' + cfg.wsp_psicologa.replace(/[^0-9]/g,'') + '?text=' + encodeURIComponent(msg), '_blank');
+}
 async function cancelar(id) { if(!confirm('¿Cancelar este turno?'))return; await sb.from('turnos').update({estado:'cancelado'}).eq('id',id); loadAll(); }
 
 function verComp(id) {
@@ -733,6 +748,7 @@ function buildHChecks() {
 }
 async function loadCfg() {
   const{data}=await sb.from('config').select('*').single(); if(!data)return;
+  if(data.precio)        $('cPrecio').value=data.precio;
   if(data.cbu)           $('cCBU').value=data.cbu;
   if(data.alias)         $('cAlias').value=data.alias;
   if(data.titular)       $('cTit').value=data.titular;
@@ -741,14 +757,14 @@ async function loadCfg() {
 }
 async function saveCfg() {
   const horarios=[...document.querySelectorAll('#hchecks input:checked')].map(c=>c.value);
-  const{error}=await sb.from('config').upsert({id:1,cbu:$('cCBU').value.trim(),alias:$('cAlias').value.trim(),titular:$('cTit').value.trim(),wsp_psicologa:$('cWsp').value.trim(),horarios});
+  const{error}=await sb.from('config').upsert({id:1,precio:$('cPrecio').value.trim(),cbu:$('cCBU').value.trim(),alias:$('cAlias').value.trim(),titular:$('cTit').value.trim(),wsp_psicologa:$('cWsp').value.trim(),horarios});
   const ok=$('cfgOk'); ok.style.display=error?'none':'block'; if(!error)setTimeout(()=>{ok.style.display='none';},2500);
 }
 
 // ── REALTIME + POLLING ──
 function subRT() {
   sb.channel('admin-rt')
-    .on('postgres_changes',{event:'*',schema:'public',table:'turnos'},loadAll)
+    .on('postgres_changes',{event:'*',schema:'public',table:'turnos'},async (payload)=>{ await loadAll(); if(payload.eventType==='INSERT') notifNuevoTurno(payload.new); })
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'mensajes'},()=>{
       loadMsgs(); if(selPat)refreshChat(selPat,selNom);
     })
