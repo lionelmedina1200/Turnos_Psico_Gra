@@ -158,20 +158,55 @@ function showError(msg) {
   `;
 }
 
-// Supabase procesa el token internamente y redirige limpio a /confirm.html
-// La única forma confiable es escuchar onAuthStateChange
-function confirmar() {
-  // Timeout por si el evento nunca llega (link expirado, ya usado, etc.)
-  const timeout = setTimeout(() => {
-    showError('El link de confirmación expiró o ya fue usado. Podés intentar registrarte de nuevo.');
-  }, 6000);
+async function confirmar() {
+  try {
+    // 1. Intentar con token_hash en la URL (?token_hash=...&type=email)
+    const qp = new URLSearchParams(window.location.search);
+    const tokenHash = qp.get('token_hash');
+    const type      = qp.get('type');
 
-  sb.auth.onAuthStateChange((event, session) => {
-    if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
-      clearTimeout(timeout);
-      showSuccess(session?.user?.email);
+    if (tokenHash) {
+      const { data, error } = await sb.auth.verifyOtp({
+        token_hash: tokenHash,
+        type: type || 'email'
+      });
+      if (error) {
+        showError('El link de confirmación expiró o ya fue usado. Intentá registrarte de nuevo.');
+      } else {
+        showSuccess(data.user?.email);
+      }
+      return;
     }
-  });
+
+    // 2. Intentar con access_token en el hash (#access_token=...&type=signup)
+    const hash = window.location.hash.substring(1);
+    if (hash) {
+      const hp = new URLSearchParams(hash);
+      const accessToken  = hp.get('access_token');
+      const refreshToken = hp.get('refresh_token');
+      if (accessToken) {
+        const { data, error } = await sb.auth.setSession({ access_token: accessToken, refresh_token: refreshToken || '' });
+        if (error) { showError(); return; }
+        showSuccess(data.user?.email);
+        return;
+      }
+    }
+
+    // 3. Sin params: escuchar onAuthStateChange con timeout
+    const timeout = setTimeout(() => {
+      showError('El link de confirmación expiró o ya fue usado. Intentá registrarte de nuevo.');
+    }, 5000);
+
+    sb.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+        clearTimeout(timeout);
+        showSuccess(session?.user?.email);
+      }
+    });
+
+  } catch(e) {
+    showError();
+  }
 }
 
 confirmar();
